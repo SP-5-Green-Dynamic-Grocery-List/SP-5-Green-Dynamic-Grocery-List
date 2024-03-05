@@ -1,68 +1,79 @@
 // CreateAccountScreen.js
+
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, database } from './config/firebase';
 
-// Add navigation to the function's parameters to use it inside the component
-export default function CreateAccountScreen({ navigation }) {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+
+
+
+
+const CreateAccountScreen = ({ navigation }) => { // Pass navigation as a prop
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const auth = getAuth(); // Get the authentication instance
 
-  const handleCreateAccount = () => {
-    console.log(firstName, lastName, email);
-
+  const handleRegistration = () => {
+    // Use createUserWithEmailAndPassword method
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // On successful registration
+        console.log('Registration successful');
+        // Navigate to another screen after successful registration
+        navigation.navigate('Home');
+      })
+      .catch((error) => {
+        // Handle registration error
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error('Registration error:', errorMessage);
+        
+      });
   };
 
+  
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>First Name</Text>
+      <Text style={styles.title}>Register</Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter your first name"
-        value={firstName}
-        onChangeText={setFirstName}
-      />
-
-      <Text style={styles.label}>Last Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your last name"
-        value={lastName}
-        onChangeText={setLastName}
-      />
-
-      <Text style={styles.label}>Email Address</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your email"
-        keyboardType="email-address"
+        placeholder="Email"
+        onChangeText={text => setEmail(text)}
         value={email}
-        onChangeText={setEmail}
       />
-
-      <Button title="Create Account" onPress={handleCreateAccount} />
-      {/* Use navigation.goBack() to go back to the previous screen */}
-      <Button title="Back" onPress={() => navigation.goBack()} />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        onChangeText={text => setPassword(text)}
+        value={password}
+      />
+      <Button title="Register" onPress={handleRegistration} />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
   },
   input: {
-    marginBottom: 15,
-    paddingHorizontal: 10,
+    width: '100%',
     height: 40,
-    borderColor: 'gray',
     borderWidth: 1,
+    borderColor: '#ccc',
     borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
 });
+
+export default CreateAccountScreen;
