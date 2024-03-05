@@ -1,66 +1,44 @@
+// ListScreen.js
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
 
+const ListScreen = ({ navigation }) => {
+  const [lists, setLists] = useState([]);
 
-const initialItems = [
-  { id: 1, name: '' },
-  { id: 2, name: '' },
-
-];
-
-export default function ListScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [items, setItems] = useState(initialItems);
-
-  // Filter items based on search query
-  const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const addList = (list) => {
+    setLists(currentLists => [...currentLists, { ...list, id: Math.random().toString() }]);
+  };
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search..."
-        value={searchQuery}
-        onChangeText={text => setSearchQuery(text)}
+      <Button title="Add List" onPress={() => navigation.navigate('Add List', { addList })} />
+      <FlatList
+        data={lists}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.listItem} onPress={() => navigation.navigate('List Details', { list: item })}>
+            <Text style={styles.listItemText}>{item.name}</Text>
+            <Text>{item.description}</Text>
+          </TouchableOpacity>
+        )}
       />
-      <ScrollView style={styles.scrollView}>
-        {filteredItems.map((item, index) => (
-          <View key={item.id} style={styles.tableRow}>
-
-          </View>
-        ))}
-      </ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 20,
   },
-  searchBar: {
-    marginHorizontal: 10,
-    marginBottom: 10,
-    paddingHorizontal: 8,
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  tableRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
+  listItem: {
+    padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: 'gray',
   },
-  cell: {
-    flex: 1,
+  listItemText: {
+    fontWeight: 'bold',
   },
 });
+
+export default ListScreen;
