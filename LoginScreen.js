@@ -17,7 +17,7 @@ const LoginScreen = ({ navigation }) => { // Pass navigation as a prop
       .then((userCredential) => {
         // On successful registration
         const user = userCredential.user;
-        console.log('Registration successful');
+        console.log('Login successful');
         // Navigate to another screen after successful registration
         navigation.navigate('Home');
       })
