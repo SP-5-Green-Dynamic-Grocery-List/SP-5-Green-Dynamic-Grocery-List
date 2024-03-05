@@ -2,19 +2,32 @@
 
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { auth, database } from './config/firebase';
 
 
 const LoginScreen = ({ navigation }) => { // Pass navigation as a prop
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const auth = getAuth(); // Get the authentication instance
 
   const handleLogin = () => {
-    // Handle login logic here
-    console.log('Email:', email);
-    console.log('Password:', password);
-
-    // Navigate to AnotherScreen after successful login
-    navigation.navigate('Home');
+    // Use createUserWithEmailAndPassword method
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // On successful registration
+        const user = userCredential.user;
+        console.log('Registration successful');
+        // Navigate to another screen after successful registration
+        navigation.navigate('Home');
+      })
+      .catch((error) => {
+        // Handle registration error
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error('Login error:', errorMessage);
+        
+      });
   };
 
   
