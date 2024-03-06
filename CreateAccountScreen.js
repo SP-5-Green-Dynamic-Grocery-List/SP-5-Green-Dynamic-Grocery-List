@@ -35,7 +35,7 @@ const CreateAccountScreen = ({ navigation }) => { // Pass navigation as a prop
   
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Registration</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"

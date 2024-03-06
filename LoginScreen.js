@@ -42,10 +42,6 @@ const LoginScreen = ({ navigation }) => {
           <Button title="Back" onPress={() => navigation.navigate('Welcome')} />
         </View>
       </View>
-      <Button
-        title="Back"
-        onPress={() => navigation.goBack()} // Use goBack() or replace with navigation.navigate('YourScreenName') if you want to navigate to a specific screen
-      />
     </View>
   );
 };
