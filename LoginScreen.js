@@ -34,7 +34,14 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={text => setPassword(text)}
         value={password}
       />
-      <Button title="Login" onPress={handleLogin} />
+      <View style={styles.buttonContainer}>
+        <View style={[styles.button, { marginBottom: 10 }]}>
+          <Button title="Login" onPress={handleLogin} />
+        </View>
+        <View style={styles.button}>
+          <Button title="Back" onPress={() => navigation.navigate('Welcome')} />
+        </View>
+      </View>
       <Button
         title="Back"
         onPress={() => navigation.goBack()} // Use goBack() or replace with navigation.navigate('YourScreenName') if you want to navigate to a specific screen
@@ -62,6 +69,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     paddingHorizontal: 10,
+  },
+  buttonContainer: {
+    width: '100%',
+  },
+  button: {
+    width: '100%',
   },
 });
 
