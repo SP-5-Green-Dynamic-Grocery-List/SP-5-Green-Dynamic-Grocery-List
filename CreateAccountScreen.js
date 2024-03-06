@@ -35,7 +35,7 @@ const CreateAccountScreen = ({ navigation }) => { // Pass navigation as a prop
   
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+      <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -49,7 +49,14 @@ const CreateAccountScreen = ({ navigation }) => { // Pass navigation as a prop
         onChangeText={text => setPassword(text)}
         value={password}
       />
-      <Button title="Register" onPress={handleRegistration} />
+      <View style={styles.buttonContainer}>
+        <View style={[styles.button, { marginBottom: 10 }]}>
+          <Button title="Login" onPress={handleRegistration} />
+        </View>
+        <View style={styles.button}>
+          <Button title="Back" onPress={() => navigation.navigate('Welcome')} />
+        </View>
+      </View>
     </View>
   );
 };
@@ -73,6 +80,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     paddingHorizontal: 10,
+  },
+  buttonContainer: {
+    width: '100%',
+  },
+  button: {
+    width: '100%',
   },
 });
 

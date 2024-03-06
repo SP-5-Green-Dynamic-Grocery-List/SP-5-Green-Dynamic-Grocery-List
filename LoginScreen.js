@@ -47,7 +47,14 @@ const LoginScreen = ({ navigation }) => { // Pass navigation as a prop
         onChangeText={text => setPassword(text)}
         value={password}
       />
-      <Button title="Login" onPress={handleLogin} />
+      <View style={styles.buttonContainer}>
+        <View style={[styles.button, { marginBottom: 10 }]}>
+          <Button title="Login" onPress={handleLogin} />
+        </View>
+        <View style={styles.button}>
+          <Button title="Back" onPress={() => navigation.navigate('Welcome')} />
+        </View>
+      </View>
     </View>
   );
 };
@@ -72,6 +79,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
   },
+  buttonContainer: {
+    width: '100%',
+  },
+  button: {
+    width: '100%',
+  },
 });
+
 
 export default LoginScreen;
