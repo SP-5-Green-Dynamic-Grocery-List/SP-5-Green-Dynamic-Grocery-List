@@ -47,7 +47,11 @@ function ItemDiscovery() {
           <Text style={styles.itemText}>Price: {selectedItem.price}</Text>
         </View>
       )}
+      <Button title="Add to List" onPress={() => navigation.navigate('List Details', { selectedItem })}
+/>
+
     </View>
+    
   );
 }
 

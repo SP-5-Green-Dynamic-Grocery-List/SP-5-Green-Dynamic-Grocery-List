@@ -5,6 +5,10 @@ import { View, Text, StyleSheet, Button, FlatList } from 'react-native';
 const ListDetailsScreen = ({ route, navigation }) => {
   const { list } = route.params;
 
+const { selectedItem } = route.params ?? {};
+
+const [items, setItems] = React.useState(list.items || []);
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -13,20 +17,31 @@ const ListDetailsScreen = ({ route, navigation }) => {
     });
   }, [navigation]);
 
+  React.useEffect(() => {
+    if (selectedItem) {
+      // Check if the item is not already in the list
+      const itemExists = items.some(item => item.id === selectedItem.id);
+      if (!itemExists) {
+        setItems(currentItems => [...currentItems, selectedItem]);
+      }
+    }
+  }, [selectedItem]);
+  
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{list.name}</Text>
       <Text style={styles.description}>{list.description}</Text>
       <FlatList
-        data={list.items}
+        data={items}
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Text style={styles.itemText}>{item.name}</Text>
           </View>
         )}
-        
-      />
+/>
+
         <Button title="Back" onPress={() => navigation.goBack()} />
     </View>
   );

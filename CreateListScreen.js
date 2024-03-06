@@ -37,13 +37,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   input: {
+    width: '100%',
     marginBottom: 20,
     borderWidth: 1,
     borderColor: 'gray',
     padding: 10,
   },
 });
+
 
 export default CreateListScreen;

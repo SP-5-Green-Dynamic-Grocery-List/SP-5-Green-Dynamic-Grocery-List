@@ -1,36 +1,23 @@
-// LoginScreen.js
-
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { auth, database } from './config/firebase';
 
-
-const LoginScreen = ({ navigation }) => { // Pass navigation as a prop
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const auth = getAuth(); // Get the authentication instance
 
   const handleLogin = () => {
-    // Use createUserWithEmailAndPassword method
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // On successful registration
-        const user = userCredential.user;
         console.log('Login successful');
-        // Navigate to another screen after successful registration
         navigation.navigate('Home');
       })
       .catch((error) => {
-        // Handle registration error
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.error('Login error:', errorMessage);
-        
+        console.error('Login error:', error.message);
       });
   };
 
-  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -48,6 +35,10 @@ const LoginScreen = ({ navigation }) => { // Pass navigation as a prop
         value={password}
       />
       <Button title="Login" onPress={handleLogin} />
+      <Button
+        title="Back"
+        onPress={() => navigation.goBack()} // Use goBack() or replace with navigation.navigate('YourScreenName') if you want to navigate to a specific screen
+      />
     </View>
   );
 };

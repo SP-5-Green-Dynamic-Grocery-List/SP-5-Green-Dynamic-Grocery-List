@@ -60,6 +60,7 @@ function AppNavigation() {
         <Stack.Screen name= "List Details" component={ListDetailsScreen} options={{headerShown: false}}/>
         {/* The main app flow in the bottom tabs */}
         <Stack.Screen name="Home" component={MyTabs} options={{ headerShown: false }} />
+        <Stack.Screen name= "Item Discovery" component={ItemDiscovery} options={{headerShown: false}} />
       </Stack.Navigator>
     </NavigationContainer>
   );
