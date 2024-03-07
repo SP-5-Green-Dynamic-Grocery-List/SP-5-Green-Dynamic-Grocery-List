@@ -54,13 +54,13 @@ function AppNavigation() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Welcome">
         <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Create Account" component={CreateAccountScreen} options={{headerShown: false}} />
-        <Stack.Screen name="Add List" component={CreateListScreen} options={{headerShown: false}} />
-        <Stack.Screen name= "List Details" component={ListDetailsScreen} options={{headerShown: false}}/>
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: true }} />
+        <Stack.Screen name="Create Account" component={CreateAccountScreen} options={{headerShown: true}} />
+        <Stack.Screen name="Add List" component={CreateListScreen} options={{headerShown: true}} />
+        <Stack.Screen name= "List Details" component={ListDetailsScreen} options={{headerShown: true}}/>
         {/* The main app flow in the bottom tabs */}
         <Stack.Screen name="Home" component={MyTabs} options={{ headerShown: false }} />
-        <Stack.Screen name= "Item Discovery" component={ItemDiscovery} options={{headerShown: false}} />
+        <Stack.Screen name= "Item Discovery" component={ItemDiscovery} options={{headerShown: true}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

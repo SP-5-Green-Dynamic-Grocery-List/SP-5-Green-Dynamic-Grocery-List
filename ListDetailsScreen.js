@@ -1,6 +1,6 @@
 // ListDetailsScreen
 import React from 'react';
-import { View, Text, StyleSheet, Button, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Button, FlatList, Image, TouchableOpacity} from 'react-native';
 
 const ListDetailsScreen = ({ route, navigation }) => {
   const { list } = route.params;
@@ -9,13 +9,22 @@ const { selectedItem } = route.params ?? {};
 
 const [items, setItems] = React.useState(list.items || []);
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button onPress={() => alert('Settings')} title="Settings" />
-      ),
-    });
-  }, [navigation]);
+React.useLayoutEffect(() => {
+  navigation.setOptions({
+    headerRight: () => (
+    <TouchableOpacity
+      onPress={() => alert('Settings')}
+      style={{ padding: 10 }} // Add padding to increase touch area
+    >
+      <Image
+        source={require('./assets/icons/setting.png')} // Make sure the path is correct
+        style={{ width: 24, height: 24 }}
+      />
+    </TouchableOpacity>
+
+    ),
+  });
+}, [navigation]);
 
   React.useEffect(() => {
     if (selectedItem) {
@@ -50,12 +59,13 @@ const [items, setItems] = React.useState(list.items || []);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 24,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 10,
+    marginTop: 70, 
   },
   description: {
     fontSize: 16,
