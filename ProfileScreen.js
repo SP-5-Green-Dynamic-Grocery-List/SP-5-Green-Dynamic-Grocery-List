@@ -6,16 +6,28 @@ const ProfileScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [isEditing, setIsEditing] = useState(false); // State to manage edit mode
+  const [isEditing, setIsEditing] = useState(false);
+
+  // State to store initial values
+  const [initialValues, setInitialValues] = useState({ firstName: '', lastName: '', email: '' });
 
   const handleSubmit = () => {
     console.log('Submitting:', { firstName, lastName, email });
     alert('Profile Updated');
     setIsEditing(false); // Turn off edit mode after submitting
+    // Update initial values to the new submitted values
+    setInitialValues({ firstName, lastName, email });
   };
 
   const handleEdit = () => {
-    setIsEditing(true); // Turn on edit mode
+    if (!isEditing) { // If we're about to enter edit mode, store current values as initial
+      setInitialValues({ firstName, lastName, email });
+    } else { // If we're canceling edit mode, revert back to initial values
+      setFirstName(initialValues.firstName);
+      setLastName(initialValues.lastName);
+      setEmail(initialValues.email);
+    }
+    setIsEditing(!isEditing); // Toggle edit mode
   };
 
   return (
@@ -50,6 +62,7 @@ const ProfileScreen = () => {
             placeholder="Enter your email address"
           />
           <Button title="Update Profile" onPress={handleSubmit} />
+          <Button title="Cancel" onPress={handleEdit} />
         </>
       )}
     </View>
