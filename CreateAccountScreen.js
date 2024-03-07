@@ -5,10 +5,6 @@ import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, database } from './config/firebase';
 
-
-
-
-
 const CreateAccountScreen = ({ navigation }) => { // Pass navigation as a prop
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
