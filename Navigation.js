@@ -3,7 +3,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Image } from 'react-native';
+import { Image, TouchableOpacity} from 'react-native';
+import { HeaderLeft, HeaderRight } from './CustomHeader';
 
 import HomeScreen from './HomeScreen';
 import ListScreen from './ListScreen';
@@ -31,14 +32,16 @@ function MyTabs({ user }) {
             iconName = require('./assets/icons/list.png');
           } else if (route.name === 'Profile') {
             iconName = require('./assets/icons/user.png');
-          }
-          else if (route.name === 'Search') {
+          } else if (route.name === 'Search') {
             iconName = require('./assets/icons/search.png');
           }
           return <Image source={iconName} style={{ width: size, height: size, tintColor: color }} />;
         },
         tabBarActiveTintColor: '#A9C4EE',
         tabBarInactiveTintColor: 'gray',
+        headerLeft: () => <HeaderLeft />,
+        headerRight: () => <HeaderRight onLogout={() => console.log('Handle logout')} />,
+        headerShown: true, // Ensure the header is shown for tabs
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} initialParams={{ user }} />
@@ -65,6 +68,7 @@ function AppNavigation() {
           component={MyTabs} 
           options={{ headerShown: false }}/>
         <Stack.Screen name= "Item Discovery" component={ItemDiscovery} options={{headerShown: true}} />
+        <Stack.Screen name= "Profile Screen" component={ProfileScreen} options={{headerShown: true}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

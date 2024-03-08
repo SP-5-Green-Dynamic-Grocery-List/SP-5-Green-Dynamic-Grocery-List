@@ -11,12 +11,6 @@ const CreateListScreen = ({ route, navigation }) => {
   const handleSaveList = () => {
     addList({ name, description });
     navigation.goBack();
-    
-
-
-
-
-
 
   };
 
