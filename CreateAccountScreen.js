@@ -4,33 +4,67 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, database } from './config/firebase';
-
-
-
-
+import { getDatabase, ref, get, push } from 'firebase/database';
 
 const CreateAccountScreen = ({ navigation }) => { // Pass navigation as a prop
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const auth = getAuth(); // Get the authentication instance
+  const db = getDatabase(); // Get the database instance
 
   const handleRegistration = () => {
-    // Use createUserWithEmailAndPassword method
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // On successful registration
-        console.log('Registration successful');
-        // Navigate to another screen after successful registration
-        navigation.navigate('Home');
+    const usersRef = ref(db, 'users');
+    
+    // Check if the user already exists
+    get(usersRef)
+      .then((snapshot) => {
+        const users = snapshot.val();
+        const existingUser = Object.values(users).find((user) => user.email === email);
+        
+        if (existingUser) {
+          console.log('User already exists');
+          // Handle case where user already exists, e.g., show an error message
+          return;
+        }
+  
+        // Use createUserWithEmailAndPassword method
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            // On successful registration
+            console.log('Registration successful');
+            
+            const user = userCredential.user;
+            
+            // Add user data to the Firebase Realtime Database
+            const userData = {
+              UID: user.uid,
+              email: email,
+              listIDs: {} // Initialize an empty list of listIDs
+            };
+  
+            // Push the user data to the 'users' node
+            push(usersRef, userData)
+              .then((newUserRef) => {
+                console.log('User added to the database');
+                // Navigate to the home screen or any other screen as needed
+                navigation.navigate('Home', { user });
+              })
+              .catch((error) => {
+                console.error('Error adding user to the database:', error);
+              });
+          })
+          .catch((error) => {
+            // Handle registration error
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error('Registration error:', errorMessage);
+          });
       })
       .catch((error) => {
-        // Handle registration error
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.error('Registration error:', errorMessage);
-        
+        console.error('Error checking if user exists:', error);
       });
   };
+  
 
   
   return (

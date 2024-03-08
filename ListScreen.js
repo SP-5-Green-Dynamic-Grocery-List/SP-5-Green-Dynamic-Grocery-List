@@ -1,12 +1,37 @@
 // ListScreen.js
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
+import { auth, database } from './config/firebase';
+import { getDatabase, ref, get } from 'firebase/database';
+import { useRoute } from '@react-navigation/native';
+
+const db = getDatabase();
+
 
 const ListScreen = ({ navigation }) => {
   const [lists, setLists] = useState([]);
+  const route = useRoute();
+  const { user } = route.params;
 
   const addList = (list) => {
-    setLists(currentLists => [...currentLists, { ...list, id: Math.random().toString() }]);
+    // Assume db is your Firebase database reference
+    let userUID = "DnXGdd2JHJXmBT6HxcKGlOTtegE3"; // Example user UID
+    let newListData = {
+      listName: "newListName",
+      creatorUID: userUID,
+      collaboratorUIDs: {},
+      listItemIDs: {}
+    };
+
+    // Push the new list data to the "lists" node
+    let newListRef = db.ref("lists").push();
+    newListRef.set(newListData); // Firebase will generate unique ID for this list
+
+
+
+
+
+
   };
 
   return (

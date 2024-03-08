@@ -19,7 +19,7 @@ import ListDetailsScreen from './ListDetailsScreen';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MyTabs() {
+function MyTabs({ user }) {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -41,13 +41,14 @@ function MyTabs() {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="List" component={ListScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} initialParams={{ user }} />
+      <Tab.Screen name="List" component={ListScreen} initialParams={{ user }} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Search" component={ItemDiscovery} />
     </Tab.Navigator>
   );
 }
+
 
 function AppNavigation() {
   return (
@@ -59,7 +60,10 @@ function AppNavigation() {
         <Stack.Screen name="Add List" component={CreateListScreen} options={{headerShown: true}} />
         <Stack.Screen name= "List Details" component={ListDetailsScreen} options={{headerShown: true}}/>
         {/* The main app flow in the bottom tabs */}
-        <Stack.Screen name="Home" component={MyTabs} options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="Home" 
+          component={MyTabs} 
+          options={{ headerShown: false }}/>
         <Stack.Screen name= "Item Discovery" component={ItemDiscovery} options={{headerShown: true}} />
       </Stack.Navigator>
     </NavigationContainer>

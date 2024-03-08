@@ -11,10 +11,18 @@ const LoginScreen = ({ navigation }) => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('Login successful');
-        navigation.navigate('Home');
+
+
+        const user = userCredential.user;
+
+        
+        navigation.navigate('Home', { user });
       })
       .catch((error) => {
-        console.error('Login error:', error.message);
+        // Handle registration error
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error('Login error:', errorMessage);
       });
   };
 

@@ -1,15 +1,16 @@
-// Homescreen.js
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity , Image} from 'react-native';
 
 
-export default function HomeScreen({navigation}) {
+export default function HomeScreen({ navigation, route }) {
+  const { user } = route.params;
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.button} onPress={() => console.log("Button Pressed")}>
         <Text style={styles.buttonText}>Add Authorized Users</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('List')}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('List', { user })}>
         <Text style={styles.buttonText}>Add items to Cart</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Welcome')}>
