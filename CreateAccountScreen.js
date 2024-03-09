@@ -10,7 +10,7 @@ const CreateAccountScreen = ({ navigation }) => { // Pass navigation as a prop
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const auth = getAuth(); // Get the authentication instance
-  const db = getDatabase(); // Get the database instance
+  const db = database; // Get the database instance
 
   const handleRegistration = () => {
     const usersRef = ref(db, 'users');

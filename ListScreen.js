@@ -1,49 +1,55 @@
-// ListScreen.js
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
-import { auth, database } from './config/firebase';
-import { getDatabase, ref, get } from 'firebase/database';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { getDatabase, ref, onValue, off } from 'firebase/database';
 import { useRoute } from '@react-navigation/native';
+import { auth, database } from './config/firebase';
 
-const db = getDatabase();
 
+const db = database; // Firebase Realtime Database instance
 
 const ListScreen = ({ navigation }) => {
   const [lists, setLists] = useState([]);
   const route = useRoute();
   const { user } = route.params;
 
-  const addList = (list) => {
-    // Assume db is your Firebase database reference
-    let userUID = "DnXGdd2JHJXmBT6HxcKGlOTtegE3"; // Example user UID
-    let newListData = {
-      listName: "newListName",
-      creatorUID: userUID,
-      collaboratorUIDs: {},
-      listItemIDs: {}
+  useEffect(() => {
+    // Reference to the "lists" node in the Realtime Database
+    const listsRef = ref(db, 'lists');
+
+    // Listen for changes in the data
+    onValue(listsRef, (snapshot) => {
+      const listsData = snapshot.val();
+      if (listsData) {
+        // Convert the object of lists to an array
+        const listsArray = Object.keys(listsData).map((key) => ({
+          id: key,
+          ...listsData[key],
+        }));
+        setLists(listsArray);
+      } else {
+        setLists([]);
+      }
+    });
+
+    // Cleanup function to detach the listener when component unmounts
+    return () => {
+      // Detach the listener
+      off(listsRef);
     };
-
-    // Push the new list data to the "lists" node
-    let newListRef = db.ref("lists").push();
-    newListRef.set(newListData); // Firebase will generate unique ID for this list
-
-
-
-
-
-
-  };
+  }, []); // Dependency array is empty to run effect only once
 
   return (
     <View style={styles.container}>
-      <Button title="Add List" onPress={() => navigation.navigate('Add List', { addList })} />
       <FlatList
         data={lists}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.listItem} onPress={() => navigation.navigate('List Details', { list: item })}>
-            <Text style={styles.listItemText}>{item.name}</Text>
-            <Text>{item.description}</Text>
+          <TouchableOpacity
+            style={styles.listItem}
+            onPress={() => navigation.navigate('List Details', { list: item })}
+          >
+            <Text style={styles.listItemText}>{item.listName}</Text>
+            {/* You can display additional list information here */}
           </TouchableOpacity>
         )}
       />
