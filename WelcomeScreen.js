@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Button, StyleSheet, Text, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { auth, database } from './config/firebase';
 
 export default function WelcomeScreen({ navigation }) {
   const [fadeAnim] = useState(new Animated.Value(0)); // Initial opacity for the overlay gradient
@@ -21,6 +23,29 @@ export default function WelcomeScreen({ navigation }) {
       ])
     ).start();
   }, [fadeAnim]);
+
+  const handleLogin = () => {
+    email = 'login@test.com'
+    password = 'password'
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        console.log('Login successful');
+
+
+        const user = userCredential.user;
+
+        
+        navigation.navigate('Home', { user });
+      })
+      .catch((error) => {
+        // Handle registration error
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error('Login error:', errorMessage);
+      });
+  };
+
+
 
   return (
     <View style={styles.container}>
@@ -55,6 +80,10 @@ export default function WelcomeScreen({ navigation }) {
         title="Login"
         onPress={() => navigation.navigate('Login')} 
       />
+      <Button
+        title="skip"
+
+        onPress={handleLogin} />
     </View>
   );
 }
