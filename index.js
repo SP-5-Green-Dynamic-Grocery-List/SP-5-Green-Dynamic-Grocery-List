@@ -1,54 +1,69 @@
 const axios = require('axios');
 
-// Replace 'Your_Access_Token' with your actual access token
-const accessToken = 'eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHBzOi8vYXBpLmtyb2dlci5jb20vdjEvLndlbGwta25vd24vandrcy5qc29uIiwia2lkIjoiWjRGZDNtc2tJSDg4aXJ0N0xCNWM2Zz09IiwidHlwIjoiSldUIn0.eyJhdWQiOiJuZXdhcHBncm9jZXJ5bGlzdC02ZDA3ODkyYzg5ZTQ2ODg0NWVhZGYxNWNhYjA1YjRhODQ3NDA1NzAxOTQ5MTkxODQxNDAiLCJleHAiOjE3MTAzNTc4OTQsImlhdCI6MTcxMDM1NjA4OSwiaXNzIjoiYXBpLmtyb2dlci5jb20iLCJzdWIiOiI3MzExNTljNy1lNDlmLTU2OWMtYjBiYS05MjUzNGUyNDJiNWEiLCJzY29wZSI6InByb2R1Y3QuY29tcGFjdCIsImF1dGhBdCI6MTcxMDM1NjA5NDIzODMxNDMyMywiYXpwIjoibmV3YXBwZ3JvY2VyeWxpc3QtNmQwNzg5MmM4OWU0Njg4NDVlYWRmMTVjYWIwNWI0YTg0NzQwNTcwMTk0OTE5MTg0MTQwIn0.b84HGn0fTaoW7p5Y7y6kjiiCe3sjfLvnRg8nbkIso5mnpLmZ92xv2cY5No4v88YxEfbWSZsk3fFpnN0qtdnNQIqNld7akWd8ZsBVzIpVZc3pNCJN6RW9spW4hCbujL3_YZDEGrejO_hkYDkFgYVcPRh_Q3YSeA4WOgI96Zj2G0QlZl79A0cF-N86Qjruu8EO0I2k3OjXGH9-6mkueTZyOck2mI8h4XhEjA1RxiS_PgW0I8X1KVBavsGJvfWY4wR8arlOhLUf4D7LdeRdTPcG-tPUsvyHK6g7Fo95g3mkb3ZKYMzksva7HcUNYf9IeQowYAABrJORRfu9YI2Bn_9BRA';
-// Replace 'Your_Product_Query' with your product search query
-const productQuery = 'milk';
-// Optional: Replace with your specific store location ID
-const locationId = '01480265';
+const CLIENT_ID = 'newappgrocerylist-6d07892c89e468845eadf15cab05b4a84740570194919184140';
+const CLIENT_SECRET = 'q9RQ1s2TSX3IV6wwP7s-6_iCXSWzgr0pY-Z7kYWt';
+const TOKEN_URL = 'https://api.kroger.com/v1/connect/oauth2/token';
+const API_URL = 'https://api.kroger.com/v1/products';
+let accessToken = ''; // This will hold our access token
 
-const config = {
-  method: 'get',
-  url: `https://api.kroger.com/v1/products?filter.term=${encodeURIComponent(productQuery)}&filter.zipCode.near =30114&filter.radiusInMiles=20`,
-  headers: { 
-    'Authorization': `Bearer ${accessToken}`,
-    'Content-Type': 'application/json'
+// Function to obtain an access token
+async function obtainAccessToken() {
+  const params = new URLSearchParams();
+  params.append('grant_type', 'client_credentials');
+  params.append('scope', 'product.compact');
+
+  try {
+    const response = await axios.post(TOKEN_URL, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+      },
+    });
+
+    accessToken = response.data.access_token; // Update the access token
+    console.log('Access token obtained:', accessToken);
+    return accessToken; // Return the access token for immediate use
+  } catch (error) {
+    console.error('Error obtaining access token:', error);
+    return null; // Return null if there's an error
   }
-};
+}
 
+// Function to fetch product data using the access token
+async function fetchProductData(productQuery, locationId) {
+  try {
+    const response = await axios.get(`${API_URL}?filter.term=${encodeURIComponent(productQuery)}&filter.locationId=${locationId}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`, // Use the global accessToken variable
+        'Content-Type': 'application/json'
+      }
+    });
 
-axios.get(`https://api.kroger.com/v1/products?filter.term=${encodeURIComponent(productQuery)}&filter.locationId=${locationId}`, {
-  headers: { 
-    'Authorization': `Bearer ${accessToken}`,
-    'Content-Type': 'application/json'
+    // Process response data as needed
+    response.data.data.forEach((product, index) => {
+        console.log(`Product ${index + 1}:`);
+        console.log(`Product ID: ${product.productId}`);
+        console.log(`UPC: ${product.upc}`);
+        console.log(`Brand: ${product.brand}`);
+        console.log(`Categories: ${product.categories.join(", ")}`);
+        console.log(`Country Origin: ${product.countryOrigin}`);
+        console.log(`Description: ${product.description}`);
+    });
+  } catch (error) {
+    console.error('Error fetching product data:', error);
   }
-})
-.then(function (response) {
-  // Loop through each product in the response data
-  response.data.data.forEach((product, index) => {
-    console.log(`Product ${index + 1}:`);
-    console.log(`Product ID: ${product.productId}`);
-    console.log(`UPC: ${product.upc}`);
-    console.log(`Brand: ${product.brand}`);
-    console.log(`Categories: ${product.categories.join(", ")}`);
-    console.log(`Country Origin: ${product.countryOrigin}`);
-    console.log(`Description: ${product.description}`);
+}
 
-    // Assuming price is directly available in the product object
-    if(product.price) {
-      console.log(`Price: $${product.price.regular}`);
-    }
+// Main function to orchestrate the token fetch and product data fetch
+async function main() {
+  const productQuery = 'milk'; // Define your product query
+  const locationId = '01480265'; // Define your location ID
+  
+  // Directly obtain and use the access token
+  const token = await obtainAccessToken();
+  if (token) {
+    await fetchProductData(productQuery, locationId);
+  }
+}
 
-    // Show only the front perspective image
-    const frontImage = product.images.find(image => image.perspective === 'front');
-    if(frontImage && frontImage.sizes) {
-      const imageUrl = frontImage.sizes.find(size => size.size === 'large').url; // Example: Using 'large' size
-      console.log(`Front Image URL: ${imageUrl}`);
-    }
-
-    console.log('-----------------------------------');
-  });
-})
-.catch(function (error) {
-  console.log(error);
-});
+main();
