@@ -3,6 +3,7 @@ import { View, Button, StyleSheet, Text, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, database } from './config/firebase';
+import { useRoute } from "@react-navigation/native"
 
 export default function WelcomeScreen({ navigation }) {
   const [fadeAnim] = useState(new Animated.Value(0)); // Initial opacity for the overlay gradient
@@ -33,9 +34,15 @@ export default function WelcomeScreen({ navigation }) {
 
 
         const user = userCredential.user;
-
+        console.log('userIDfromSKIP');
+        console.log(user.uid);
+        userID = user.uid;
         
-        navigation.navigate('Home', { user });
+
+
+
+
+        navigation.navigate('Home', { user: user });
       })
       .catch((error) => {
         // Handle registration error

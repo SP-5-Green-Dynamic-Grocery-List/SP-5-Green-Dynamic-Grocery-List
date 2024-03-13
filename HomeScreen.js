@@ -1,10 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity , Image} from 'react-native';
+import { useRoute } from "@react-navigation/native"
 
 
 export default function HomeScreen({ navigation, route }) {
+  
   const { user } = route.params;
-
+  console.log('this is uid in home: ');
+  console.log(user.uid);
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.button} onPress={() => console.log("Button Pressed")}>
