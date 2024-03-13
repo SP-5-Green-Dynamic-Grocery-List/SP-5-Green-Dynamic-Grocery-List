@@ -29,41 +29,98 @@ async function obtainAccessToken() {
   }
 }
 
+// Function to fetch a location ID using the Kroger Location API
+async function fetchLocationId(zipCode) {
+    // Make sure you have a valid access token
+    if (!accessToken) {
+      console.log('Attempting to obtain access token for location fetching...');
+      await obtainAccessToken();
+    }
+    
+    try {
+      const response = await axios.get(`https://api.kroger.com/v1/locations?filter.zipCode.near=${zipCode}`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json'
+        }
+      });
+  
+      if (response.data.data && response.data.data.length > 0) {
+        const locationId = response.data.data[0].locationId;
+        console.log(`Location ID found for zip code ${zipCode}: ${locationId}`);
+        return locationId;
+      } else {
+        console.log(`No locations found for zip code ${zipCode}.`);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching location ID:', error);
+      return null;
+    }
+  }
+
+
+
 // Function to fetch product data using the access token
 async function fetchProductData(productQuery, locationId) {
-  try {
-    const response = await axios.get(`${API_URL}?filter.term=${encodeURIComponent(productQuery)}&filter.locationId=${locationId}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`, // Use the global accessToken variable
-        'Content-Type': 'application/json'
+    try {
+      // Construct the URL with optional locationId
+      const url = `${API_URL}?filter.term=${encodeURIComponent(productQuery)}${locationId ? `&filter.locationId=${locationId}` : ''}`;
+
+      const response = await axios.get(url, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Process response data as needed
+      if(response.data.data.length > 0) {
+        response.data.data.forEach((product, index) => {
+          console.log(`Product ${index + 1}:`);
+          console.log(`Product ID: ${product.productId}`);
+          console.log(`UPC: ${product.upc}`);
+          console.log(`Brand: ${product.brand}`);
+          console.log(`Categories: ${product.categories.join(", ")}`);
+          console.log(`Country Origin: ${product.countryOrigin}`);
+          console.log(`Description: ${product.description}`);
+
+          // Safely access price information
+          const item = product.items && product.items[0];
+          if (item && item.price && item.price.regular) {
+            console.log(`Regular Price: $${item.price.regular}`);
+          } else {
+            console.log("Price information not available.");
+          }
+        });
+      } else {
+        console.log('No products found for the given query.');
       }
-    });
 
-    // Process response data as needed
-    response.data.data.forEach((product, index) => {
-        console.log(`Product ${index + 1}:`);
-        console.log(`Product ID: ${product.productId}`);
-        console.log(`UPC: ${product.upc}`);
-        console.log(`Brand: ${product.brand}`);
-        console.log(`Categories: ${product.categories.join(", ")}`);
-        console.log(`Country Origin: ${product.countryOrigin}`);
-        console.log(`Description: ${product.description}`);
-    });
-  } catch (error) {
-    console.error('Error fetching product data:', error);
-  }
+    } catch (error) {
+      console.error('Error fetching product data:', error);
+    }
 }
 
-// Main function to orchestrate the token fetch and product data fetch
 async function main() {
-  const productQuery = 'milk'; // Define your product query
-  const locationId = '01480265'; // Define your location ID
+    const productQuery = 'milk'; // Define your product query
+    const zipCode = '30114'; // Example zip code for location search
   
-  // Directly obtain and use the access token
-  const token = await obtainAccessToken();
-  if (token) {
-    await fetchProductData(productQuery, locationId);
+    // Obtain an access token
+    const token = await obtainAccessToken();
+    
+    if (token) {
+      // Fetch location ID dynamically based on zip code
+      const locationId = await fetchLocationId(zipCode);
+  
+      // Proceed to fetch product data if a location ID was successfully retrieved
+      if (locationId) {
+        await fetchProductData(productQuery, locationId);
+      } else {
+        console.log(`Could not fetch product data without a valid location ID.`);
+      }
+    }
   }
-}
+  
 
 main();
