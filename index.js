@@ -103,7 +103,7 @@ async function fetchProductData(productQuery, locationId) {
 }
 
 async function main() {
-    const productQuery = 'milk'; // Define your product query
+    const productQuery = 'Orange'; // Define your product query
     const zipCode = '30114'; // Example zip code for location search
   
     // Obtain an access token
