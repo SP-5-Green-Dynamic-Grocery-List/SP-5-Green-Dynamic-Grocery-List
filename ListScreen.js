@@ -4,6 +4,10 @@ import { ref, onValue, off, query, equalTo } from 'firebase/database';
 import { useRoute } from '@react-navigation/native';
 import { auth, database } from './config/firebase';
 import { useContext } from '@react-navigation/native';
+import fetchProductData from './index';
+
+
+const axios = require('axios');
 
 const db = database; // Firebase Realtime Database instance
 
@@ -12,10 +16,34 @@ const ListScreen = ({ navigation }) => {
   const route = useRoute();
   const user = route.params.user
 
+  
+
+
   console.log('this is uid in list: ');
   console.log(user.uid);
 
+  
+  
+
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const products = await fetchProductData('orange', '30114');
+        console.log('Fetched products:', products);
+        // Further processing of fetched products
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchData();
+
+
+
+
+
+
+    
     const listsRef = ref(db, 'lists');
   
     const handleData = (snapshot) => {
