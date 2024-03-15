@@ -15,12 +15,11 @@ function ItemDiscovery({ user }) {
   const [searchedItem, setSearchedItem] = useState('');
 
   useEffect(() => {
-    // Function to fetch product data based on search query
     const fetchData = async () => {
       try {
-        const products = await fetchProductData(searchedItem, '30114'); // Assuming zip code is fixed for now
+        const products = await fetchProductData(searchedItem, '30114'); //has to be called with await and within useEffect
         console.log('Fetched products:', products);
-        // Further processing of fetched products
+        
       } catch (error) {
         console.error('Error fetching products:', error);
       }
@@ -35,10 +34,10 @@ function ItemDiscovery({ user }) {
     const handleData = (snapshot) => {
       const listsData = snapshot.val();
       if (listsData) {
-        // Iterate over each list
+        // Iterate over each list in db
         const listsArray = Object.entries(listsData).map(([listId, list]) => ({
           ...list,
-          listId: listId // Include the listId in the list object
+          listId: listId 
         }));
   
         // Filter lists based on creatorUID
@@ -58,7 +57,7 @@ function ItemDiscovery({ user }) {
     };
   }, [user, searchedItem]);
 
-  // Function to handle adding item to a list
+  
   const addToSelectedList = (list) => {
     console.log('Adding item to list:', list);
     setModalVisible(false); // Close the modal after selecting the list

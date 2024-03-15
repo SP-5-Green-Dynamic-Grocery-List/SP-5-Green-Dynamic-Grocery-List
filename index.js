@@ -83,7 +83,7 @@ async function fetchProductData(productQuery, zipCode) {
             const item = product.items && product.items[0];
             const regularPrice = item && item.price && item.price.regular ? item.price.regular : null;
 
-            // Construct an object with product information
+            
             const productInfo = {
               productId: product.productId,
               upc: product.upc,
@@ -98,7 +98,7 @@ async function fetchProductData(productQuery, zipCode) {
             products.push(productInfo);
           });
 
-          // Return the array of product information
+          
           return products;
         } else {
           return null; // Return null if no products found
