@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Text, Image, StyleSheet, Modal, FlatList, TouchableOpacity } from 'react-native';
 import { ref, onValue, off } from 'firebase/database'; // Import Firebase database related functions
-import  fetchProductData  from './index'; // Assuming fetchProductData is exported from './index'
-import { auth, database } from './config/firebase';
+import fetchProductData from './index'; // Assuming fetchProductData is exported from './index'
+import { database } from './config/firebase';
 
 const db = database;
+
 function ItemDiscovery({ user }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
@@ -59,7 +60,6 @@ function ItemDiscovery({ user }) {
 
   // Function to handle adding item to a list
   const addToSelectedList = (list) => {
-    // Here, you should update the Firebase database to add the selectedItem to the chosen list
     console.log('Adding item to list:', list);
     setModalVisible(false); // Close the modal after selecting the list
   };
@@ -73,7 +73,32 @@ function ItemDiscovery({ user }) {
         onChangeText={(text) => setSearchQuery(text)}
       />
       <Button title="Search" onPress={() => setSearchedItem(searchQuery)} />
-      {/* Your modal and list rendering code */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <FlatList
+              data={userLists}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.listItem}
+                  onPress={() => addToSelectedList(item)}
+                >
+                  <Text>{item.listName}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => item.listId}
+            />
+            <Button title="Cancel" onPress={() => setModalVisible(!modalVisible)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -92,9 +117,37 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
   },
-  // Your modal and list styles
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  listItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    width: '100%',
+    alignItems: 'center',
+  },
 });
 
 export default ItemDiscovery;
+
 
 
