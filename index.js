@@ -60,19 +60,13 @@ async function fetchLocationId(zipCode, accessToken) {
 async function fetchProductData(productQuery, zipCode) {
   const API_URL = 'https://api.kroger.com/v1/products';
   const accessToken = await obtainAccessToken();
-  // Obtain an access token
-  console.log('trying to fetch product');
-
+  
   if (accessToken) {
-    // Fetch location ID dynamically based on zip code
     const locationId = await fetchLocationId(zipCode, accessToken);
 
-    // Proceed to fetch product data if a location ID was successfully retrieved
     if (locationId) {
       try {
-        // Construct the URL with optional locationId
         const url = `${API_URL}?filter.term=${encodeURIComponent(productQuery)}${locationId ? `&filter.locationId=${locationId}` : ''}`;
-        console.log('awaiting kroger reply');
         const response = await axios.get(url, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -80,37 +74,48 @@ async function fetchProductData(productQuery, zipCode) {
           }
         });
 
-        // Process response data as needed
         if (response.data.data.length > 0) {
-          response.data.data.forEach((product, index) => {
-            console.log(`Product ${index + 1}:`);
-            console.log(`Product ID: ${product.productId}`);
-            console.log(`UPC: ${product.upc}`);
-            console.log(`Brand: ${product.brand}`);
-            console.log(`Categories: ${product.categories.join(", ")}`);
-            console.log(`Country Origin: ${product.countryOrigin}`);
-            console.log(`Description: ${product.description}`);
+          // Create an array to hold product information
+          const products = [];
 
+          response.data.data.forEach(product => {
             // Safely access price information
             const item = product.items && product.items[0];
-            if (item && item.price && item.price.regular) {
-              console.log(`Regular Price: $${item.price.regular}`);
-            } else {
-              console.log("Price information not available.");
-            }
+            const regularPrice = item && item.price && item.price.regular ? item.price.regular : null;
+
+            // Construct an object with product information
+            const productInfo = {
+              productId: product.productId,
+              upc: product.upc,
+              brand: product.brand,
+              categories: product.categories,
+              countryOrigin: product.countryOrigin,
+              description: product.description,
+              regularPrice: regularPrice
+            };
+
+            // Add the product information to the array
+            products.push(productInfo);
           });
+
+          // Return the array of product information
+          return products;
         } else {
-          console.log('No products found for the given query.');
+          return null; // Return null if no products found
         }
 
       } catch (error) {
         console.error('Error fetching product data:', error);
+        return null; // Return null in case of error
       }
     } else {
       console.log(`Could not fetch product data without a valid location ID.`);
+      return null; // Return null if no location ID
     }
   }
 }
+
+
 
 export default fetchProductData;
 

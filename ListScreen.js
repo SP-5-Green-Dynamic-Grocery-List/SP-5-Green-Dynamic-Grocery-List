@@ -4,7 +4,8 @@ import { ref, onValue, off, query, equalTo } from 'firebase/database';
 import { useRoute } from '@react-navigation/native';
 import { auth, database } from './config/firebase';
 import { useContext } from '@react-navigation/native';
-import fetchProductData from './index';
+import  fetchProductData  from './index';
+import { encode } from 'base-64';
 
 
 const axios = require('axios');
@@ -26,6 +27,7 @@ const ListScreen = ({ navigation }) => {
   
 
   useEffect(() => {
+
     const fetchData = async () => {
       try {
         const products = await fetchProductData('orange', '30114');

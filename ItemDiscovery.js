@@ -1,33 +1,67 @@
-// ItemDiscovery.js
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, Image, StyleSheet } from 'react-native';
+//ItemDiscovery.js
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Button, Text, Image, StyleSheet, Modal, FlatList, TouchableOpacity } from 'react-native';
+import { ref, onValue, off } from 'firebase/database'; // Import Firebase database related functions
+import  fetchProductData  from './index'; // Assuming fetchProductData is exported from './index'
+import { auth, database } from './config/firebase';
 
-// Example items
-const items = [
-  {
-    id: 1,
-    name: 'Natures Own Honey Wheat Bread',
-    description: 'super awesome bread',
-    price: '$100.00',
-    image: require('./assets/items/bread.png'),
-  },
-  {
-    id: 2,
-    name: 'Fairlife Milk',
-    description: 'Description for Item 2',
-    price: '$20.00',
-    image: require('./assets/items/fairlife.jpg'),
-  },
-];
-
-function ItemDiscovery() {
+const db = database;
+function ItemDiscovery({ user }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [userLists, setUserLists] = useState([]);
+  const [searchedItem, setSearchedItem] = useState('');
 
-  const handleSearch = () => {
-    // Simple search by name for demonstration
-    const foundItem = items.find(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    setSelectedItem(foundItem);
+  useEffect(() => {
+    // Function to fetch product data based on search query
+    const fetchData = async () => {
+      try {
+        const products = await fetchProductData(searchedItem, '30114'); // Assuming zip code is fixed for now
+        console.log('Fetched products:', products);
+        // Further processing of fetched products
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    if (searchedItem !== '') {
+      fetchData();
+    }
+
+    const listsRef = ref(db, 'lists');
+  
+    const handleData = (snapshot) => {
+      const listsData = snapshot.val();
+      if (listsData) {
+        // Iterate over each list
+        const listsArray = Object.entries(listsData).map(([listId, list]) => ({
+          ...list,
+          listId: listId // Include the listId in the list object
+        }));
+  
+        // Filter lists based on creatorUID
+        const userLists = listsArray.filter(list => list.creatorUID === user.uid);
+        setUserLists(userLists);
+      } else {
+        setUserLists([]);
+      }
+    };
+  
+    onValue(listsRef, handleData);
+  
+    // Cleanup function to detach the listener when component unmounts
+    return () => {
+      // Detach the listener
+      off(listsRef, handleData);
+    };
+  }, [user, searchedItem]);
+
+  // Function to handle adding item to a list
+  const addToSelectedList = (list) => {
+    // Here, you should update the Firebase database to add the selectedItem to the chosen list
+    console.log('Adding item to list:', list);
+    setModalVisible(false); // Close the modal after selecting the list
   };
 
   return (
@@ -36,22 +70,11 @@ function ItemDiscovery() {
         style={styles.searchBar}
         placeholder="Search items..."
         value={searchQuery}
-        onChangeText={setSearchQuery}
+        onChangeText={(text) => setSearchQuery(text)}
       />
-      <Button title="Search" onPress={handleSearch} />
-      {selectedItem && (
-        <View style={styles.itemDetails}>
-          <Image source={selectedItem.image} style={styles.itemImage} />
-          <Text style={styles.itemText}>Name: {selectedItem.name}</Text>
-          <Text style={styles.itemText}>Description: {selectedItem.description}</Text>
-          <Text style={styles.itemText}>Price: {selectedItem.price}</Text>
-        </View>
-      )}
-      <Button title="Add to List" onPress={() => navigation.navigate('List Details', { selectedItem })}
-/>
-
+      <Button title="Search" onPress={() => setSearchedItem(searchQuery)} />
+      {/* Your modal and list rendering code */}
     </View>
-    
   );
 }
 
@@ -69,18 +92,9 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
   },
-  itemDetails: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  itemImage: {
-    width: 100,
-    height: 100,
-    marginBottom: 10,
-  },
-  itemText: {
-    marginBottom: 5,
-  },
+  // Your modal and list styles
 });
 
 export default ItemDiscovery;
+
+
