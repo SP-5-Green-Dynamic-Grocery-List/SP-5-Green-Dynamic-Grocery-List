@@ -14,9 +14,14 @@ function ItemDiscovery({ user }) {
   const [userLists, setUserLists] = useState([]);
   const [searchedItem, setSearchedItem] = useState('');
 
+  
+
   useEffect(() => {
+    console.log('in useEffect');
+
     const fetchData = async () => {
       try {
+        console.log('trying to fetch data frfr');
         const products = await fetchProductData(searchedItem, '30114'); //has to be called with await and within useEffect
         console.log('Fetched products:', products);
         
@@ -24,30 +29,42 @@ function ItemDiscovery({ user }) {
         console.error('Error fetching products:', error);
       }
     };
-
+    
     if (searchedItem !== '') {
       fetchData();
     }
-
+    console.log('after fetch');
     const listsRef = ref(db, 'lists');
-  
+    console.log('after listref');
     const handleData = (snapshot) => {
+
+      console.log('inside handleData');
+
       const listsData = snapshot.val();
+
+      console.log('after snapshotval');
+
       if (listsData) {
+        console.log('inside listsdata');
         // Iterate over each list in db
-        const listsArray = Object.entries(listsData).map(([listId, list]) => ({
-          ...list,
-          listId: listId 
-        }));
-  
+        const listsArray = Object.entries(listsData).map(([listId, list]) => ({ ...list, listId: listId }));
+        console.log('after listsdata',);
+        console.log('New list object:');
+        console.log(listsArray);
         // Filter lists based on creatorUID
-        const userLists = listsArray.filter(list => list.creatorUID === user.uid);
+        const userLists = listsArray.filter(list => list.creatorUID === user.uid); //ERROR HERE IDK WHY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! it works in listScreen
+
+        console.log('after listPRINT');
+
         setUserLists(userLists);
+        console.log('some user lists');
       } else {
         setUserLists([]);
+        console.log('no user lists1');
       }
+
     };
-  
+    console.log('after listData');
     onValue(listsRef, handleData);
   
     // Cleanup function to detach the listener when component unmounts
@@ -55,10 +72,11 @@ function ItemDiscovery({ user }) {
       // Detach the listener
       off(listsRef, handleData);
     };
-  }, [user, searchedItem]);
-
+  }, [searchedItem]);
+  console.log('after useEffect');
   
   const addToSelectedList = (list) => {
+    
     console.log('Adding item to list:', list);
     setModalVisible(false); // Close the modal after selecting the list
   };
@@ -72,6 +90,13 @@ function ItemDiscovery({ user }) {
         onChangeText={(text) => setSearchQuery(text)}
       />
       <Button title="Search" onPress={() => setSearchedItem(searchQuery)} />
+      {selectedItem && (
+        <View style={styles.itemContainer}>
+          <Text style={styles.itemText}>Name: {selectedItem.name}</Text>
+          <Text style={styles.itemText}>Description: {selectedItem.description}</Text>
+          <Text style={styles.itemText}>Price: {selectedItem.price}</Text>
+        </View>
+      )}
       <Modal
         animationType="slide"
         transparent={true}

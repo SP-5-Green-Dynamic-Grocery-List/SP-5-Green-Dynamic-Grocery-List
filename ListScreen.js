@@ -28,6 +28,7 @@ const ListScreen = ({ navigation }) => {
 
   useEffect(() => {
 
+    /*
     const fetchData = async () => {
       try {
         const products = await fetchProductData('orange', '30114');
@@ -39,7 +40,7 @@ const ListScreen = ({ navigation }) => {
     };
 
     fetchData();
-
+    */
 
 
 
@@ -59,6 +60,7 @@ const ListScreen = ({ navigation }) => {
   
         // Filter lists based on creatorUID
         const userLists = listsArray.filter(list => list.creatorUID === user.uid);
+        
         setLists(userLists);
       } else {
         setLists([]);

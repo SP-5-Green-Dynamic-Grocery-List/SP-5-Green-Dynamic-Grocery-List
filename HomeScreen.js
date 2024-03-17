@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     left: 10, // Distance from the left of the container
   },
   icon: {
-    width: 30, // Adjust size as needed
-    height: 30, // Adjust size as needed
+    width: 30, 
+    height: 30, 
   },
 });
