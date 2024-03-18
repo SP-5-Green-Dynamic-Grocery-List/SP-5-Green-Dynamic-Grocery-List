@@ -1,7 +1,7 @@
 //ItemDiscovery.js
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Text, Image, StyleSheet, Modal, FlatList, TouchableOpacity } from 'react-native';
-import { ref, onValue, off } from 'firebase/database'; // Import Firebase database related functions
+import { ref, onValue, off, push } from 'firebase/database'; // Import Firebase database related functions
 import fetchProductData from './index'; // Assuming fetchProductData is exported from './index'
 import { database } from './config/firebase';
 import { useRoute } from '@react-navigation/native';
@@ -14,6 +14,7 @@ function ItemDiscovery({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [userLists, setUserLists] = useState([]);
   const [searchedItem, setSearchedItem] = useState('');
+  const [fetchedProducts, setFretchedProducts] = useState();
 
   
   const { user } = route.params
@@ -28,6 +29,8 @@ function ItemDiscovery({ navigation, route }) {
 
         const products = await fetchProductData(searchedItem, '30114'); //has to be called with await and within useEffect
         console.log('Fetched products:', products);
+
+        setFretchedProducts(products);
         
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -73,7 +76,39 @@ function ItemDiscovery({ navigation, route }) {
   const addToSelectedList = (list) => {
     
     console.log('Adding item to list:', list);
-    setModalVisible(false); // Close the modal after selecting the list
+
+    if (selectedItem) {
+      const { productId, description, regularPrice, frontImage } = selectedItem;
+      const newItem = {
+        productId: productId,
+        name: description,
+        price: regularPrice,
+        frontImage: frontImage
+      };
+      console.log('newItem: ', newItem);
+
+      const listRef = ref(db, `lists/${list.listName}/items`); // Adds items to the list.items list. doenst specify the name it goes in from within items becuase we let firebase assigne a unique id.
+      push(listRef, newItem)
+        .then(() => {
+          console.log('Item added to list successfully: ', list.listName);
+          setModalVisible(false); // Close modal after adding item
+        })
+        .catch((error) => {
+          console.error('Error adding item to list: ', error);
+        })
+    }else{
+      console.error('No item selected to add');
+    }
+
+
+
+
+
+
+
+
+
+    
   };
 
   return (
@@ -85,12 +120,22 @@ function ItemDiscovery({ navigation, route }) {
         onChangeText={(text) => setSearchQuery(text)}
       />
       <Button title="Search" onPress={() => setSearchedItem(searchQuery)} />
-      {selectedItem && (
-        <View style={styles.itemContainer}>
-          <Text style={styles.itemText}>Name: {selectedItem.name}</Text>
-          <Text style={styles.itemText}>Description: {selectedItem.description}</Text>
-          <Text style={styles.itemText}>Price: {selectedItem.price}</Text>
-        </View>
+      {fetchedProducts && (
+        <FlatList
+          data={fetchedProducts}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.listItem}
+              onPress={() => {
+                setSelectedItem(item); // Set the selected item
+                setModalVisible(true); // Show the modal to choose from user's lists
+              }}
+            >
+              <Text>{item.description}</Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.productId}
+        />
       )}
       <Modal
         animationType="slide"
@@ -120,6 +165,7 @@ function ItemDiscovery({ navigation, route }) {
       </Modal>
     </View>
   );
+  
 }
 
 const styles = StyleSheet.create({
