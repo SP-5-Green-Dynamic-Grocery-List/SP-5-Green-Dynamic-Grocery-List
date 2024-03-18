@@ -1,33 +1,84 @@
-// ItemDiscovery.js
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, Image, StyleSheet } from 'react-native';
+//ItemDiscovery.js
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Button, Text, Image, StyleSheet, Modal, FlatList, TouchableOpacity } from 'react-native';
+import { ref, onValue, off } from 'firebase/database'; // Import Firebase database related functions
+import fetchProductData from './index'; // Assuming fetchProductData is exported from './index'
+import { database } from './config/firebase';
 
-// Example items
-const items = [
-  {
-    id: 1,
-    name: 'Natures Own Honey Wheat Bread',
-    description: 'super awesome bread',
-    price: '$100.00',
-    image: require('./assets/items/bread.png'),
-  },
-  {
-    id: 2,
-    name: 'Fairlife Milk',
-    description: 'Description for Item 2',
-    price: '$20.00',
-    image: require('./assets/items/fairlife.jpg'),
-  },
-];
+const db = database;
 
-function ItemDiscovery() {
+function ItemDiscovery({ user }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [userLists, setUserLists] = useState([]);
+  const [searchedItem, setSearchedItem] = useState('');
 
-  const handleSearch = () => {
-    // Simple search by name for demonstration
-    const foundItem = items.find(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    setSelectedItem(foundItem);
+  
+
+  useEffect(() => {
+    console.log('in useEffect');
+
+    const fetchData = async () => {
+      try {
+        console.log('trying to fetch data frfr');
+        const products = await fetchProductData(searchedItem, '30114'); //has to be called with await and within useEffect
+        console.log('Fetched products:', products);
+        
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+    
+    if (searchedItem !== '') {
+      fetchData();
+    }
+    console.log('after fetch');
+    const listsRef = ref(db, 'lists');
+    console.log('after listref');
+    const handleData = (snapshot) => {
+
+      console.log('inside handleData');
+
+      const listsData = snapshot.val();
+
+      console.log('after snapshotval');
+
+      if (listsData) {
+        console.log('inside listsdata');
+        // Iterate over each list in db
+        const listsArray = Object.entries(listsData).map(([listId, list]) => ({ ...list, listId: listId }));
+        console.log('after listsdata',);
+        console.log('New list object:');
+        console.log(listsArray);
+        // Filter lists based on creatorUID
+        const userLists = listsArray.filter(list => list.creatorUID === user.uid); //ERROR HERE IDK WHY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! it works in listScreen
+
+        console.log('after listPRINT');
+
+        setUserLists(userLists);
+        console.log('some user lists');
+      } else {
+        setUserLists([]);
+        console.log('no user lists1');
+      }
+
+    };
+    console.log('after listData');
+    onValue(listsRef, handleData);
+  
+    // Cleanup function to detach the listener when component unmounts
+    return () => {
+      // Detach the listener
+      off(listsRef, handleData);
+    };
+  }, [searchedItem]);
+  console.log('after useEffect');
+  
+  const addToSelectedList = (list) => {
+    
+    console.log('Adding item to list:', list);
+    setModalVisible(false); // Close the modal after selecting the list
   };
 
   return (
@@ -36,22 +87,43 @@ function ItemDiscovery() {
         style={styles.searchBar}
         placeholder="Search items..."
         value={searchQuery}
-        onChangeText={setSearchQuery}
+        onChangeText={(text) => setSearchQuery(text)}
       />
-      <Button title="Search" onPress={handleSearch} />
+      <Button title="Search" onPress={() => setSearchedItem(searchQuery)} />
       {selectedItem && (
-        <View style={styles.itemDetails}>
-          <Image source={selectedItem.image} style={styles.itemImage} />
+        <View style={styles.itemContainer}>
           <Text style={styles.itemText}>Name: {selectedItem.name}</Text>
           <Text style={styles.itemText}>Description: {selectedItem.description}</Text>
           <Text style={styles.itemText}>Price: {selectedItem.price}</Text>
         </View>
       )}
-      <Button title="Add to List" onPress={() => navigation.navigate('List Details', { selectedItem })}
-/>
-
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <FlatList
+              data={userLists}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.listItem}
+                  onPress={() => addToSelectedList(item)}
+                >
+                  <Text>{item.listName}</Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => item.listId}
+            />
+            <Button title="Cancel" onPress={() => setModalVisible(!modalVisible)} />
+          </View>
+        </View>
+      </Modal>
     </View>
-    
   );
 }
 
@@ -69,18 +141,37 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
   },
-  itemDetails: {
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 22,
   },
-  itemImage: {
-    width: 100,
-    height: 100,
-    marginBottom: 10,
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  itemText: {
-    marginBottom: 5,
+  listItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    width: '100%',
+    alignItems: 'center',
   },
 });
 
 export default ItemDiscovery;
+
+
+

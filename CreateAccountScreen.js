@@ -5,6 +5,7 @@ import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, database } from './config/firebase';
 import { getDatabase, ref, get, push } from 'firebase/database';
+import { useRoute } from "@react-navigation/native"
 
 const CreateAccountScreen = ({ navigation }) => { // Pass navigation as a prop
   const [email, setEmail] = useState('');
@@ -47,7 +48,7 @@ const CreateAccountScreen = ({ navigation }) => { // Pass navigation as a prop
               .then((newUserRef) => {
                 console.log('User added to the database');
                 // Navigate to the home screen or any other screen as needed
-                navigation.navigate('Home', { user });
+                navigation.navigate('Home', { user: user });
               })
               .catch((error) => {
                 console.error('Error adding user to the database:', error);

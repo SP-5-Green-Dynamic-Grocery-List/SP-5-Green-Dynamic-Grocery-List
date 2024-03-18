@@ -14,27 +14,11 @@ export const HeaderLeft = () => (
 );
 
 // HeaderRight Component for the Logout Button
-export const HeaderRight = () => {
-  const navigation = useNavigation();
-
-  const handleLogout = () => {
-    signOut(auth).then(() => {
-      // Sign-out successful
-      navigation.navigate('Welcome'); // Replace 'WelcomeScreen' with the actual route name
-      console.log('Logout successful');
-    }).catch((error) => {
-      // An error happened
-      Alert.alert("Logout Error", error.message);
-    });
-  };
-
-  return (
-    <TouchableOpacity onPress={handleLogout}>
-      <Image source={require('./assets/icons/logout.png')}
-       style={[styles.icon, {tintColor: 'gray'}]} />
-    </TouchableOpacity>
-  );
-};
+export const HeaderRight = ({ onLogout }) => (
+  <TouchableOpacity onPress={onLogout}>
+    <Image source={require('./assets/icons/logout.png')} style={styles.icon} />
+  </TouchableOpacity>
+);
 
 const styles = StyleSheet.create({
   icon: {

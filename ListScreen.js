@@ -1,48 +1,86 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
-import { getDatabase, ref, onValue, off } from 'firebase/database';
+import { ref, onValue, off, query, equalTo } from 'firebase/database';
 import { useRoute } from '@react-navigation/native';
 import { auth, database } from './config/firebase';
+import { useContext } from '@react-navigation/native';
+import  fetchProductData  from './index';
+import { encode } from 'base-64';
 
+
+const axios = require('axios');
 
 const db = database; // Firebase Realtime Database instance
 
 const ListScreen = ({ navigation }) => {
   const [lists, setLists] = useState([]);
   const route = useRoute();
-  const { user } = route.params;
+  const user = route.params.user
+
+  
+
+
+  console.log('this is uid in list: ');
+  console.log(user.uid);
+
+  
+  
 
   useEffect(() => {
-    // Reference to the "lists" node in the Realtime Database
-    const listsRef = ref(db, 'lists');
 
-    // Listen for changes in the data
-    onValue(listsRef, (snapshot) => {
+    /*
+    const fetchData = async () => {
+      try {
+        const products = await fetchProductData('orange', '30114');
+        console.log('Fetched products:', products);
+        // Further processing of fetched products
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchData();
+    */
+
+
+
+
+
+    
+    const listsRef = ref(db, 'lists');
+  
+    const handleData = (snapshot) => {
       const listsData = snapshot.val();
       if (listsData) {
-        // Convert the object of lists to an array
-        const listsArray = Object.keys(listsData).map((key) => ({
-          id: key,
-          ...listsData[key],
+        // Iterate over each list
+        const listsArray = Object.entries(listsData).map(([listId, list]) => ({
+          ...list,
+          listId: listId // Include the listId in the list object
         }));
-        setLists(listsArray);
+  
+        // Filter lists based on creatorUID
+        const userLists = listsArray.filter(list => list.creatorUID === user.uid);
+        
+        setLists(userLists);
       } else {
         setLists([]);
       }
-    });
-
+    };
+  
+    onValue(listsRef, handleData);
+  
     // Cleanup function to detach the listener when component unmounts
     return () => {
       // Detach the listener
-      off(listsRef);
+      off(listsRef, handleData);
     };
-  }, []); // Dependency array is empty to run effect only once
+  }, [user]);
+  
 
   return (
     <View style={styles.container}>
       <FlatList
         data={lists}
-        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.listItem}
@@ -52,6 +90,7 @@ const ListScreen = ({ navigation }) => {
             {/* You can display additional list information here */}
           </TouchableOpacity>
         )}
+        keyExtractor={(item) => item.listID}
       />
     </View>
   );
@@ -73,3 +112,4 @@ const styles = StyleSheet.create({
 });
 
 export default ListScreen;
+

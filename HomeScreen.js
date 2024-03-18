@@ -1,10 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity , Image} from 'react-native';
+import { useRoute } from "@react-navigation/native"
 
 
 export default function HomeScreen({ navigation, route }) {
+  
   const { user } = route.params;
-
+  console.log('this is uid in home: ');
+  console.log(user.uid);
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.button} onPress={() => console.log("Button Pressed")}>
@@ -40,7 +43,7 @@ const styles = StyleSheet.create({
     left: 10, // Distance from the left of the container
   },
   icon: {
-    width: 30, // Adjust size as needed
-    height: 30, // Adjust size as needed
+    width: 30, 
+    height: 30, 
   },
 });

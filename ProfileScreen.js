@@ -1,22 +1,25 @@
 // ProfileScreen.js
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Button, Text } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import { auth, database } from './config/firebase';
 
 const ProfileScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [zipCode, setZipCode] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
   // State to store initial values
-  const [initialValues, setInitialValues] = useState({ firstName: '', lastName: '', email: '' });
+  const [initialValues, setInitialValues] = useState({ firstName: '', lastName: '', email: '', zipCode: ''});
 
   const handleSubmit = () => {
-    console.log('Submitting:', { firstName, lastName, email });
+    console.log('Submitting:', { firstName, lastName, email, zipCode });
     alert('Profile Updated');
     setIsEditing(false); // Turn off edit mode after submitting
     // Update initial values to the new submitted values
-    setInitialValues({ firstName, lastName, email });
+    setInitialValues({ firstName, lastName, email, ZipCode });
   };
 
   const handleEdit = () => {
@@ -26,6 +29,7 @@ const ProfileScreen = () => {
       setFirstName(initialValues.firstName);
       setLastName(initialValues.lastName);
       setEmail(initialValues.email);
+      setZipCode(initialValues.zipCode);
     }
     setIsEditing(!isEditing); // Toggle edit mode
   };
@@ -60,6 +64,13 @@ const ProfileScreen = () => {
             value={email}
             keyboardType="email-address"
             placeholder="Enter your email address"
+          />
+          <Text style={styles.label}>Zip Code</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={setZipCode}
+            value={lastName}
+            placeholder="Enter your Zip Code"
           />
           <Button title="Update Profile" onPress={handleSubmit} />
           <Button title="Cancel" onPress={handleEdit} />

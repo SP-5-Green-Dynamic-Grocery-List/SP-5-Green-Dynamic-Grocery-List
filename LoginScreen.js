@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useRoute } from "@react-navigation/native"
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -14,9 +15,10 @@ const LoginScreen = ({ navigation }) => {
 
 
         const user = userCredential.user;
-
+        console.log('user uid: ');
+        console.log(user.uid);
         
-        navigation.navigate('Home', { user });
+        navigation.navigate('Home', { user: user });
       })
       .catch((error) => {
         // Handle registration error

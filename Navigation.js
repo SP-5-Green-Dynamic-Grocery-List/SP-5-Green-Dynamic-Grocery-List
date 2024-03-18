@@ -21,7 +21,9 @@ import ListManagement from './ListManagement';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MyTabs({ user }) {
+function MyTabs({ route }) {
+  const { user } = route.params || {}; // Extracting user from route params
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -47,11 +49,12 @@ function MyTabs({ user }) {
     >
       <Tab.Screen name="Home" component={HomeScreen} initialParams={{ user }} />
       <Tab.Screen name="List" component={ListScreen} initialParams={{ user }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="Search" component={ItemDiscovery} />
+      <Tab.Screen name="Profile" component={ProfileScreen} initialParams={{ user }} />
+      <Tab.Screen name="Search" component={ItemDiscovery} initialParams={{ user }} />
     </Tab.Navigator>
   );
 }
+
 
 
 function AppNavigation() {
