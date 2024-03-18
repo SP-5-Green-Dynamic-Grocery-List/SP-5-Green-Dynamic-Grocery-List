@@ -15,6 +15,7 @@ import ItemDiscovery from './ItemDiscovery.js';
 import CreateAccountScreen from './CreateAccountScreen';
 import CreateListScreen from './CreateListScreen';
 import ListDetailsScreen from './ListDetailsScreen';
+import ListManagement from './ListManagement';
 
 
 const Stack = createStackNavigator();
@@ -72,6 +73,7 @@ function AppNavigation() {
           options={{ headerShown: false }}/>
         <Stack.Screen name= "Item Discovery" component={ItemDiscovery} options={{headerShown: true}} />
         <Stack.Screen name= "Profile Screen" component={ProfileScreen} options={{headerShown: true}}/>
+        <Stack.Screen name= "List Management" component={ListManagement} options={{headerShown: true}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
