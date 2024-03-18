@@ -11,7 +11,7 @@ import ListScreen from './ListScreen';
 import ProfileScreen from './ProfileScreen';
 import WelcomeScreen from './WelcomeScreen';
 import LoginScreen from './LoginScreen';
-import ItemDiscovery from './ItemDiscovery.js';
+import ItemDiscovery from './ItemDiscovery';
 import CreateAccountScreen from './CreateAccountScreen';
 import CreateListScreen from './CreateListScreen';
 import ListDetailsScreen from './ListDetailsScreen';
@@ -49,8 +49,8 @@ function MyTabs({ route }) {
     >
       <Tab.Screen name="Home" component={HomeScreen} initialParams={{ user }} />
       <Tab.Screen name="List" component={ListScreen} initialParams={{ user }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} initialParams={{ user }} />
       <Tab.Screen name="Search" component={ItemDiscovery} initialParams={{ user }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} initialParams={{ user }} />
     </Tab.Navigator>
   );
 }
