@@ -4,10 +4,11 @@ import { View, TextInput, Button, Text, Image, StyleSheet, Modal, FlatList, Touc
 import { ref, onValue, off } from 'firebase/database'; // Import Firebase database related functions
 import fetchProductData from './index'; // Assuming fetchProductData is exported from './index'
 import { database } from './config/firebase';
+import { useRoute } from '@react-navigation/native';
 
 const db = database;
 
-function ItemDiscovery({ user }) {
+function ItemDiscovery({ navigation, route }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -15,13 +16,16 @@ function ItemDiscovery({ user }) {
   const [searchedItem, setSearchedItem] = useState('');
 
   
+  const { user } = route.params
+
+  
 
   useEffect(() => {
-    console.log('in useEffect');
+
 
     const fetchData = async () => {
       try {
-        console.log('trying to fetch data frfr');
+
         const products = await fetchProductData(searchedItem, '30114'); //has to be called with await and within useEffect
         console.log('Fetched products:', products);
         
@@ -33,38 +37,29 @@ function ItemDiscovery({ user }) {
     if (searchedItem !== '') {
       fetchData();
     }
-    console.log('after fetch');
+
     const listsRef = ref(db, 'lists');
-    console.log('after listref');
+
+
     const handleData = (snapshot) => {
-
-      console.log('inside handleData');
-
       const listsData = snapshot.val();
 
-      console.log('after snapshotval');
-
       if (listsData) {
-        console.log('inside listsdata');
+        console.log('lists: ', listsData);
         // Iterate over each list in db
         const listsArray = Object.entries(listsData).map(([listId, list]) => ({ ...list, listId: listId }));
-        console.log('after listsdata',);
-        console.log('New list object:');
-        console.log(listsArray);
-        // Filter lists based on creatorUID
-        const userLists = listsArray.filter(list => list.creatorUID === user.uid); //ERROR HERE IDK WHY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! it works in listScreen
-
-        console.log('after listPRINT');
-
+        
+        const userLists = listsArray.filter(list => list.creatorUID === user.uid); 
+        
         setUserLists(userLists);
-        console.log('some user lists');
+        console.log('some user lists: ', userLists);
       } else {
         setUserLists([]);
         console.log('no user lists1');
       }
 
     };
-    console.log('after listData');
+
     onValue(listsRef, handleData);
   
     // Cleanup function to detach the listener when component unmounts
@@ -72,8 +67,8 @@ function ItemDiscovery({ user }) {
       // Detach the listener
       off(listsRef, handleData);
     };
-  }, [searchedItem]);
-  console.log('after useEffect');
+  }, [searchedItem, user]);
+
   
   const addToSelectedList = (list) => {
     

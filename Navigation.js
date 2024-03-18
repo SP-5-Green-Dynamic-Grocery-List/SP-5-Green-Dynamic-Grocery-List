@@ -11,7 +11,7 @@ import ListScreen from './ListScreen';
 import ProfileScreen from './ProfileScreen';
 import WelcomeScreen from './WelcomeScreen';
 import LoginScreen from './LoginScreen';
-import ItemDiscovery from './ItemDiscovery';
+import ItemDiscovery from './ItemDiscovery.js';
 import CreateAccountScreen from './CreateAccountScreen';
 import CreateListScreen from './CreateListScreen';
 import ListDetailsScreen from './ListDetailsScreen';

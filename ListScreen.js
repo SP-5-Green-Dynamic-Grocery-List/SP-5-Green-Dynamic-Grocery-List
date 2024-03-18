@@ -59,7 +59,7 @@ const ListScreen = ({ navigation }) => {
         }));
   
         // Filter lists based on creatorUID
-        const userLists = listsArray.filter(list => list.creatorUID === user.uid);
+         const userLists = listsArray.filter(list => list.creatorUID === user.uid); 
         
         setLists(userLists);
       } else {
@@ -75,6 +75,7 @@ const ListScreen = ({ navigation }) => {
       off(listsRef, handleData);
     };
   }, [user]);
+  
   
 
   return (
