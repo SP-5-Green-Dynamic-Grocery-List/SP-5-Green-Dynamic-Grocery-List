@@ -1,82 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
-import { ref, onValue, off, query, equalTo } from 'firebase/database';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Button, Modal, TextInput } from 'react-native';
+import { ref, onValue, off, push, set } from 'firebase/database';
 import { useRoute } from '@react-navigation/native';
-import { auth, database } from './config/firebase';
-import { useContext } from '@react-navigation/native';
-import  fetchProductData  from './index';
-import { encode } from 'base-64';
+import { database } from './config/firebase';
 
 
-const axios = require('axios');
-
-const db = database; // Firebase Realtime Database instance
+const db = database;
 
 const ListScreen = ({ navigation }) => {
   const [lists, setLists] = useState([]);
   const route = useRoute();
-  const user = route.params.user
+  const user = route.params.user;
 
-  
-
-
-  console.log('this is uid in list: ');
-  console.log(user.uid);
-
-  
-  
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [newUserListName, setNewUserListName] = useState('');
 
   useEffect(() => {
-
-    /*
-    const fetchData = async () => {
-      try {
-        const products = await fetchProductData('orange', '30114');
-        console.log('Fetched products:', products);
-        // Further processing of fetched products
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-
-    fetchData();
-    */
-
-
-
-
-
-    
     const listsRef = ref(db, 'lists');
-  
+
     const handleData = (snapshot) => {
       const listsData = snapshot.val();
       if (listsData) {
-        // Iterate over each list
         const listsArray = Object.entries(listsData).map(([listId, list]) => ({
           ...list,
-          listId: listId // Include the listId in the list object
+          listId: listId,
         }));
-  
-        // Filter lists based on creatorUID
-         const userLists = listsArray.filter(list => list.creatorUID === user.uid); 
-        
+        const userLists = listsArray.filter((list) => list.creatorUID === user.uid);
         setLists(userLists);
       } else {
         setLists([]);
       }
     };
-  
+
     onValue(listsRef, handleData);
-  
-    // Cleanup function to detach the listener when component unmounts
+
     return () => {
-      // Detach the listener
       off(listsRef, handleData);
     };
   }, [user]);
+
+  const handleAddNewList = () => {
+    const newListRef = push(ref(db, 'lists'));
+    const newListData = {
+      listName: newUserListName || `New List ${Date.now()}`, // Use provided name or a default name
+      creatorUID: user.uid,
+      items: [],
+    };
   
-  
+    // Use the set function correctly with the new list reference and data
+    set(newListRef, newListData)
+      .then(() => {
+        console.log('New list added successfully');
+        setIsModalVisible(false); // Close the modal
+        setNewUserListName(''); // Reset the input field for the next use
+      })
+      .catch((error) => {
+        console.error('Error adding new list:', error);
+      });
+  };
 
   return (
     <View style={styles.container}>
@@ -88,11 +69,30 @@ const ListScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('List Details', { list: item })}
           >
             <Text style={styles.listItemText}>{item.listName}</Text>
-            {/* You can display additional list information here */}
           </TouchableOpacity>
         )}
-        keyExtractor={(item) => item.listID}
+        keyExtractor={(item) => item.listId}
       />
+      <Button title="Add New List" onPress={() => setIsModalVisible(true)} />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter new list name"
+              value={newUserListName}
+              onChangeText={setNewUserListName}
+            />
+            <Button title="Add List" onPress={handleAddNewList} />
+            <Button title="Cancel" onPress={() => setIsModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -110,7 +110,35 @@ const styles = StyleSheet.create({
   listItemText: {
     fontWeight: 'bold',
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)', // Add a semi-transparent background to the modal
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    width: '100%',
+  },
 });
 
 export default ListScreen;
-
