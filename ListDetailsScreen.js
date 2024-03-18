@@ -12,16 +12,15 @@ const [items, setItems] = React.useState(list.items || []);
 React.useLayoutEffect(() => {
   navigation.setOptions({
     headerRight: () => (
-    <TouchableOpacity
-      onPress={() => alert('Settings')}
-      style={{ padding: 10 }} // Add padding to increase touch area
-    >
-      <Image
-        source={require('./assets/icons/setting.png')} // Make sure the path is correct
-        style={{ width: 24, height: 24 }}
-      />
-    </TouchableOpacity>
-
+      <TouchableOpacity
+        onPress={() => navigation.navigate('List Management', { listId: list.id })} // Pass the list ID or any other relevant data
+        style={{ padding: 10 }}
+      >
+        <Image
+          source={require('./assets/icons/setting.png')}
+          style={{ width: 24, height: 24 }}
+        />
+      </TouchableOpacity>
     ),
   });
 }, [navigation]);

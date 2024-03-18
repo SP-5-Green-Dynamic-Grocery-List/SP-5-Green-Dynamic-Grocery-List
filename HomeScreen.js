@@ -13,9 +13,6 @@ export default function HomeScreen({ navigation, route }) {
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('List', { user })}>
         <Text style={styles.buttonText}>Add items to Cart</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Welcome')}>
-        <Text style={styles.buttonText}>Log Out</Text>
-      </TouchableOpacity>
     </View>
   );
 }
