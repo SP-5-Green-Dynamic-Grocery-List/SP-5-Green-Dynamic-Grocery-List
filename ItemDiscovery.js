@@ -137,6 +137,8 @@ function ItemDiscovery({ navigation, route }) {
                 resizeMode="contain"
               />
               <Text>{item.description}</Text>
+              
+              <Text>${item.regularPrice}</Text>
             </TouchableOpacity>
           )}
           keyExtractor={(item) => item.productId}
