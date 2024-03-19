@@ -1,31 +1,36 @@
-// ListManagement.js
-import React from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
-import { getDatabase, ref, remove } from 'firebase/database';
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet, Button, Alert } from 'react-native';
 
-const ListManagement = ({ route, navigation }) => {
-  const { listId } = route.params; // Assuming you pass the list ID as a parameter
+const ListManagementScreen = ({ route, navigation }) => {
+  const [listName, setListName] = useState('');
+  const [listDescription, setListDescription] = useState('');
 
-  const db = getDatabase();
+  const handleSaveChanges = () => {
+    // Placeholder for save functionality
+    Alert.alert('Action Needed', 'Save functionality needs implementation.');
+  };
 
   const handleDeleteList = () => {
-    const listRef = ref(db, `lists/${listId}`);
-    remove(listRef)
-      .then(() => {
-        Alert.alert('Success', 'List deleted successfully');
-        navigation.goBack(); // Assuming you want to go back to the previous screen
-      })
-      .catch((error) => {
-        Alert.alert('Error', error.message);
-      });
+    // Placeholder for delete functionality
+    Alert.alert('Action Needed', 'Delete functionality needs implementation.');
   };
 
   return (
     <View style={styles.container}>
-      <Text>List Management</Text>
-      <Button title="Add User" onPress={() => {}} /> {/* Implement the Add User functionality */}
-      <Button title="Edit List" onPress={() => {}} /> {/* Implement the Edit List functionality */}
-      <Button title="Delete List" onPress={handleDeleteList} />
+      <TextInput
+        style={styles.input}
+        value={listName}
+        onChangeText={setListName}
+        placeholder="List Name"
+      />
+      <TextInput
+        style={styles.input}
+        value={listDescription}
+        onChangeText={setListDescription}
+        placeholder="List Description"
+      />
+      <Button title="Save Changes" onPress={handleSaveChanges} />
+      <Button title="Delete List" onPress={handleDeleteList} color="#ff4444" />
     </View>
   );
 };
@@ -33,10 +38,15 @@ const ListManagement = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 10,
   },
 });
 
-export default ListManagement;
+export default ListManagementScreen;

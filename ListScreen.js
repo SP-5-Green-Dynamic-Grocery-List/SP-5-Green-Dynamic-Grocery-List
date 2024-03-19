@@ -1,3 +1,4 @@
+// ListScreen.js
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Button, Modal, TextInput } from 'react-native';
 import { ref, onValue, off, push, set } from 'firebase/database';
