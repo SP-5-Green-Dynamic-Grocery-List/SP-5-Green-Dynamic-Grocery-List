@@ -131,6 +131,11 @@ function ItemDiscovery({ navigation, route }) {
                 setModalVisible(true); // Show the modal to choose from user's lists
               }}
             >
+              <Image
+                source={{ uri: item.frontImage }}
+                style={styles.itemImage} // Define this style
+                resizeMode="contain"
+              />
               <Text>{item.description}</Text>
             </TouchableOpacity>
           )}
@@ -159,7 +164,10 @@ function ItemDiscovery({ navigation, route }) {
               )}
               keyExtractor={(item) => item.listId}
             />
-            <Button title="Cancel" onPress={() => setModalVisible(!modalVisible)} />
+            <Button
+              title="Cancel"
+              onPress={() => setModalVisible(!modalVisible)}
+            />
           </View>
         </View>
       </Modal>
@@ -189,7 +197,9 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
-    margin: 20,
+    maxHeight: '80%', // Prevents modal from taking the whole screen
+    width: '90%', // Adjusts width to be a bit less than screen width
+    minHeight: 200, // Ensures modal is at least somewhat visible even with little content
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
@@ -202,6 +212,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    flexGrow: 1,
   },
   listItem: {
     padding: 10,
@@ -209,6 +220,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     width: '100%',
     alignItems: 'center',
+  },
+  itemImage: {
+    width: '100%', // Take up the full width of the TouchableOpacity
+    height: 150, // Adjust the height as needed
+    marginBottom: 10, // Add some space between the image and the text
   },
 });
 

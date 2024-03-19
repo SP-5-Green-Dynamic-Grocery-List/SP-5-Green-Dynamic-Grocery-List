@@ -83,7 +83,7 @@ async function fetchProductData(productQuery, zipCode) {
             const item = product.items && product.items[0];
             const regularPrice = item && item.price && item.price.regular ? item.price.regular : null;
             // Grab the image url and get the small one 3 because we dont want the 4k pic
-            const frontImageUrl = product.images && product.images.length > 0 ? product.images[0].sizes && product.images[0].sizes.length > 0 ? product.images[0].sizes[3].url : null : null;
+            const frontImageUrl = product.images && product.images.length > 0 ? product.images[0].sizes && product.images[0].sizes.length > 0 ? product.images[0].sizes[2].url : null : null;
             
             
             const productInfo = {
