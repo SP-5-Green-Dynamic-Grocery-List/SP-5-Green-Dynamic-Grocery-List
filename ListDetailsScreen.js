@@ -20,6 +20,7 @@ const ListDetailsScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Text>{list.description}</Text>
       <Text style={styles.title}>{list.listName}</Text>
       <FlatList
         data={items}
