@@ -1,37 +1,45 @@
-// ListDetailsScreen.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, FlatList, Image, TouchableOpacity } from 'react-native';
 import { ref, onValue, off } from 'firebase/database';
-import { database } from './config/firebase'; // Assuming you have this export
+import { database } from './config/firebase'; 
 
 const ListDetailsScreen = ({ route, navigation }) => {
   const { list } = route.params;
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    // Assuming `list.id` is the correct reference to your list in Firebase
-    const listRef = ref(database, `lists/${list.Name}/items`);
+    const listRef = ref(database, `lists/${list.listId}/items`);
     const onListChange = onValue(listRef, (snapshot) => {
       const data = snapshot.val();
-      const itemList = data ? Object.entries(data).map(([key, value]) => ({ id: key, ...value })) : [];
+      const itemList = data ? Object.values(data) : [];
       setItems(itemList);
     });
 
     return () => off(listRef, 'value', onListChange);
-  }, [list.id]);
+  }, [list.listId]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{list.name}</Text>
-      <Text style={styles.description}>{list.description || 'No description'}</Text>
+      <Text style={styles.title}>{list.listName}</Text>
       <FlatList
         data={items}
-        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.itemContainer}>
-            <Text style={styles.itemText}>{item.name}</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.listItem}
+            onPress={() => {
+              // Handle item press if needed
+            }}
+          >
+            <Image
+              source={{ uri: item.frontImage }}
+              style={styles.itemImage}
+              resizeMode="contain"
+            />
+            <Text>{item.name}</Text>
+            <Text>${item.price}</Text>
+          </TouchableOpacity>
         )}
+        keyExtractor={(item) => item.productId}
       />
       <Button title="Back" onPress={() => navigation.goBack()} />
     </View>
@@ -47,20 +55,17 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 10,
-    marginTop: 70, 
   },
-  description: {
-    fontSize: 16,
-    color: 'gray',
-    marginBottom: 20,
-  },
-  itemContainer: {
-    paddingVertical: 10,
+  listItem: {
+    padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#cccccc',
+    borderBottomColor: '#ccc',
+    width: '100%',
+    alignItems: 'center',
   },
-  itemText: {
-    fontSize: 18,
+  itemImage: {
+    width: 100,
+    height: 100,
   },
 });
 
