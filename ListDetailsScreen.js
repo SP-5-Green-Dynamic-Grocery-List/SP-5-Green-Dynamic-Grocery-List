@@ -26,9 +26,6 @@ const ListDetailsScreen = ({ route, navigation }) => {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.listItem}
-            onPress={() => {
-              // Handle item press if needed
-            }}
           >
             <Image
               source={{ uri: item.frontImage }}
