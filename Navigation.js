@@ -13,7 +13,6 @@ import WelcomeScreen from './WelcomeScreen';
 import LoginScreen from './LoginScreen';
 import ItemDiscovery from './ItemDiscovery';
 import CreateAccountScreen from './CreateAccountScreen';
-import CreateListScreen from './CreateListScreen';
 import ListDetailsScreen from './ListDetailsScreen';
 import ListManagement from './ListManagement';
 
@@ -64,7 +63,6 @@ function AppNavigation() {
         <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: true }} />
         <Stack.Screen name="Create Account" component={CreateAccountScreen} options={{headerShown: true}} />
-        <Stack.Screen name="Add List" component={CreateListScreen} options={{headerShown: true}} />
         <Stack.Screen name= "List Details" component={ListDetailsScreen} options={{headerShown: true}}/>
         {/* The main app flow in the bottom tabs */}
         <Stack.Screen 
