@@ -29,8 +29,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   content: {
-    alignItems: 'center', // Center-align the content
-    justifyContent: 'center', // Center content vertically if needed
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   welcomeText: {
     color: '#333',
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginHorizontal: 20,
-    marginBottom: 40, // Add some space between the text and the icon
+    marginBottom: 40,
   },
   icon: {
     width: 120,

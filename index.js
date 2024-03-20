@@ -1,3 +1,4 @@
+// index.js
 import { encode } from 'base-64';
 import axios, * as others from 'axios';
 
@@ -125,8 +126,8 @@ export default fetchProductData;
 
 
 async function main() {
-    const productQuery = 'Orange'; // Define your product query
-    const zipCode = '30114'; // Example zip code for location search
+    const productQuery = 'Orange';
+    const zipCode = '30114';
   
     fetchProductData(productQuery,zipCode);
   }

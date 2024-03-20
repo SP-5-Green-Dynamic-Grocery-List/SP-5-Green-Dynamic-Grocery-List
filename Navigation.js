@@ -64,7 +64,6 @@ function AppNavigation() {
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: true }} />
         <Stack.Screen name="Create Account" component={CreateAccountScreen} options={{headerShown: true}} />
         <Stack.Screen name= "List Details" component={ListDetailsScreen} options={{headerShown: true}}/>
-        {/* The main app flow in the bottom tabs */}
         <Stack.Screen 
           name="Home" 
           component={MyTabs} 
