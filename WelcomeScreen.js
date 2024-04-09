@@ -13,12 +13,12 @@ export default function WelcomeScreen({ navigation }) {
       Animated.sequence([
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 3000,
+          duration: 2500,
           useNativeDriver: true,
         }),
         Animated.timing(fadeAnim, {
           toValue: 0,
-          duration: 3000,
+          duration: 2500,
           useNativeDriver: true,
         }),
       ])
@@ -57,7 +57,7 @@ export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['rgba(255, 255, 255, 0.2)', 'rgba(135, 180, 255, 0.8)']}
+        colors={['rgba(255, 255, 255, 0.2)', 'rgba(130, 160, 230, 0.8)']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -71,7 +71,7 @@ export default function WelcomeScreen({ navigation }) {
         ]}
       >
         <LinearGradient
-          colors={['rgba(135, 206, 235, 0.8)', 'rgba(255, 255, 255, 0.2)']}
+           colors={['rgba(115, 184, 235, 0.8)', 'rgba(255, 255, 255, 0.4)']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}

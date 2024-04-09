@@ -1,8 +1,8 @@
 //ItemDiscovery.js
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Text, Image, StyleSheet, Modal, FlatList, TouchableOpacity } from 'react-native';
-import { ref, onValue, off, push } from 'firebase/database'; // Import Firebase database related functions
-import fetchProductData from './index'; // Assuming fetchProductData is exported from './index'
+import { ref, onValue, off, push } from 'firebase/database';
+import fetchProductData from './index';
 import { database } from './config/firebase';
 import { useRoute } from '@react-navigation/native';
 
@@ -133,7 +133,7 @@ function ItemDiscovery({ navigation, route }) {
             >
               <Image
                 source={{ uri: item.frontImage }}
-                style={styles.itemImage} // Define this style
+                style={styles.itemImage}
                 resizeMode="contain"
               />
               <Text>{item.description}</Text>
@@ -199,9 +199,9 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
-    maxHeight: '80%', // Prevents modal from taking the whole screen
-    width: '90%', // Adjusts width to be a bit less than screen width
-    minHeight: 200, // Ensures modal is at least somewhat visible even with little content
+    maxHeight: '80%',
+    width: '90%',
+    minHeight: 200, 
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
@@ -224,9 +224,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemImage: {
-    width: '100%', // Take up the full width of the TouchableOpacity
-    height: 150, // Adjust the height as needed
-    marginBottom: 10, // Add some space between the image and the text
+    width: '100%',
+    height: 150,
+    marginBottom: 10,
   },
 });
 

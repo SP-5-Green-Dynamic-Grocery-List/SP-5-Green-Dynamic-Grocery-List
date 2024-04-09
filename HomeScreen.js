@@ -29,6 +29,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   content: {
+    alignItems: 'center',
+    justifyContent: 'center',
     alignItems: 'center', 
     justifyContent: 'center', 
   },
@@ -38,7 +40,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginHorizontal: 20,
-    marginBottom: 40, // Add some space between the text and the icon
+    marginBottom: 40,
   },
   icon: {
     width: 120,

@@ -20,10 +20,9 @@ export const HeaderLeft = () => (
   const handleLogout = () => {
     signOut(auth).then(() => {
       // Sign-out successful
-      navigation.navigate('Welcome'); // Replace 'WelcomeScreen' with the actual route name
+      navigation.navigate('Welcome');
       console.log('Logout successful');
     }).catch((error) => {
-      // An error happened
       Alert.alert("Logout Error", error.message);
     });
   };
