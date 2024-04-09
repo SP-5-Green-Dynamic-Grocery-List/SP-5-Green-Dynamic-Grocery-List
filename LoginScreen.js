@@ -12,8 +12,6 @@ const LoginScreen = ({ navigation }) => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('Login successful');
-
-
         const user = userCredential.user;
         console.log('user uid: ');
         console.log(user.uid);

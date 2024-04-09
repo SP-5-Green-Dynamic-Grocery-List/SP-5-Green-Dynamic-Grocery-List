@@ -29,8 +29,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   content: {
-    alignItems: 'center', // Center-align the content
-    justifyContent: 'center', // Center content vertically if needed
+    alignItems: 'center', 
+    justifyContent: 'center', 
   },
   welcomeText: {
     color: '#333',

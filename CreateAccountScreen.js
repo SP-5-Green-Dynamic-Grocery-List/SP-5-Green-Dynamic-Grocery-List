@@ -33,9 +33,7 @@ const CreateAccountScreen = ({ navigation }) => { // Pass navigation as a prop
           .then((userCredential) => {
             // On successful registration
             console.log('Registration successful');
-            
             const user = userCredential.user;
-            
             // Add user data to the Firebase Realtime Database
             const userData = {
               UID: user.uid,
