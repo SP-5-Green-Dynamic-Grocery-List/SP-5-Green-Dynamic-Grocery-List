@@ -45,6 +45,7 @@ const ListScreen = ({ navigation }) => {
     const newListData = {
       listName: newUserListName || `New List ${Date.now()}`, // Use provided name or a default name
       creatorUID: user.uid,
+      collaboratorUIDs: [],
       items: [],
     };
   

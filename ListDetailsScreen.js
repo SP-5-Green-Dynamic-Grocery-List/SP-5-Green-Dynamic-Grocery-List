@@ -6,6 +6,7 @@ import { database } from './config/firebase';
 const ListDetailsScreen = ({ route, navigation }) => {
   const { list } = route.params;
   const [items, setItems] = useState([]);
+  const [collaborators, setCollaborators] = useState([]);
 
   useEffect(() => {
     const listRef = ref(database, `lists/${list.listId}/items`);
@@ -15,13 +16,27 @@ const ListDetailsScreen = ({ route, navigation }) => {
       setItems(itemList);
     });
 
-    return () => off(listRef, 'value', onListChange);
-  }, [list.listId]);
+    console.log('databaseList: ',list.collaboratorUIDs)
+    setCollaborators(list.collaboratorUIDs);
+
+    
+    console.log('List of Collaborators:', collaborators);
+
+    return () => {
+      off(listRef, 'value', onListChange);
+    };
+  }, [list.listId, list.collaboratorUIDs, collaborators]);
 
   return (
     <View style={styles.container}>
-      <Text>{list.description}</Text>
-      <Text style={styles.title}>{list.listName}</Text>
+      <Text>Description: {list.description}</Text>
+      <Text style={styles.title}>List Name: {list.listName}</Text>
+      <Text>Collaborators:</Text>
+      <View>
+      {Object.values(list.collaboratorUIDs).map((collaborator, index) => (
+        <Text key={index}>{collaborator}</Text>
+      ))}
+    </View>
       <FlatList
         data={items}
         renderItem={({ item }) => (
@@ -68,3 +83,5 @@ const styles = StyleSheet.create({
 });
 
 export default ListDetailsScreen;
+
+
