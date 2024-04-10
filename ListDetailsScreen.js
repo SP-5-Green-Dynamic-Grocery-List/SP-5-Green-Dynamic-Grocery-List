@@ -1,3 +1,4 @@
+// ListDetailsScreen.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, FlatList, Image, TouchableOpacity } from 'react-native';
 import { ref, onValue, off } from 'firebase/database';

@@ -26,7 +26,11 @@ const ListScreen = ({ navigation }) => {
           ...list,
           listId: listId,
         }));
-        const userLists = listsArray.filter((list) => list.creatorUID === user.uid);
+        //const userLists = listsArray.filter((list) => list.creatorUID === user.uid);
+        const userLists = listsArray.filter((list) => {
+          const collaboratorUIDs = Object.values(list.collaboratorUIDs || {});
+          return list.creatorUID === user.uid || collaboratorUIDs.includes(user.uid);
+        });
         setLists(userLists);
       } else {
         setLists([]);
@@ -49,7 +53,7 @@ const ListScreen = ({ navigation }) => {
       items: [],
     };
   
-    // Use the set function correctly with the new list reference and data
+    
     set(newListRef, newListData)
       .then(() => {
         console.log('New list added successfully');
@@ -116,7 +120,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)', // Add a semi-transparent background to the modal
+    backgroundColor: 'rgba(0,0,0,0.5)', 
   },
   modalView: {
     margin: 20,
