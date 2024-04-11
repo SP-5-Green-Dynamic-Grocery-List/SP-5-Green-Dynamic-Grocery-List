@@ -87,7 +87,7 @@ function ItemDiscovery({ navigation, route }) {
       };
       console.log('newItem: ', newItem);
 
-      const listRef = ref(db, `lists/${list.listName}/items`); // Adds items to the list.items list. doenst specify the name it goes in from within items becuase we let firebase assigne a unique id.
+      const listRef = ref(db, `lists/${list.listId}/items`); // Adds items to the list.items list. doenst specify the name it goes in from within items becuase we let firebase assigne a unique id.
       push(listRef, newItem)
         .then(() => {
           console.log('Item added to list successfully: ', list.listName);
