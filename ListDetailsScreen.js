@@ -5,11 +5,14 @@ import { ref, onValue, off } from 'firebase/database';
 import { database } from './config/firebase'; 
 
 const ListDetailsScreen = ({ route, navigation }) => {
+  console.log('made it to details screen');
   const { list } = route.params;
   const [items, setItems] = useState([]);
-  const [collaborators, setCollaborators] = useState([]);
-
+  const [collaborators, setCollaborators] = useState(list.collaboratorUIDs || []);
+  const [newCollaborator, setNewCollaborator] = useState('');
+  console.log('beforeUse');
   useEffect(() => {
+    console.log('made it to useeffect');
     const listRef = ref(database, `lists/${list.listId}/items`);
     const onListChange = onValue(listRef, (snapshot) => {
       const data = snapshot.val();
@@ -28,16 +31,25 @@ const ListDetailsScreen = ({ route, navigation }) => {
     };
   }, [list.listId, list.collaboratorUIDs, collaborators]);
 
+  const addCollaborator = () => {
+    console.log('adding new collab');
+    const listRef = ref(database, `lists/${list.listId}/collaboratorUIDs`);
+    push(listRef, newCollaborator);
+    setNewCollaborator(''); // Clear input field after adding
+  };
+
+
   return (
     <View style={styles.container}>
       <Text>Description: {list.description}</Text>
       <Text style={styles.title}>List Name: {list.listName}</Text>
       <Text>Collaborators:</Text>
       <View>
-      {Object.values(list.collaboratorUIDs).map((collaborator, index) => (
-        <Text key={index}>{collaborator}</Text>
-      ))}
-    </View>
+        {list.collaboratorUIDs && Object.values(list.collaboratorUIDs).map((collaborator, index) => (
+          <Text key={index}>{collaborator}</Text>
+        ))}
+        <Button title="add collaborator" onPress={addCollaborator} />
+      </View>
       <FlatList
         data={items}
         renderItem={({ item }) => (

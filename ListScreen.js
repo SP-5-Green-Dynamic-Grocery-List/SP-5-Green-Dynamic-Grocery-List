@@ -45,6 +45,7 @@ const ListScreen = ({ navigation }) => {
   }, [user]);
 
   const handleAddNewList = () => {
+    console.log('add new pushed: ');
     const newListRef = push(ref(db, 'lists'));
     const newListData = {
       listName: newUserListName || `New List ${Date.now()}`, // Use provided name or a default name
