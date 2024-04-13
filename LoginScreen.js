@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRoute } from "@react-navigation/native"
+import { useNavigation } from '@react-navigation/native';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -26,31 +27,39 @@ const LoginScreen = ({ navigation }) => {
       });
   };
 
+  const handleCreateAccount = () => {
+    navigation.navigate('Create Account');
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <Text style={styles.title}>Sign in</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor="#888"
         onChangeText={text => setEmail(text)}
         value={email}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
+        placeholderTextColor="#888"
         secureTextEntry
         onChangeText={text => setPassword(text)}
         value={password}
       />
-      <View style={styles.buttonContainer}>
-        <View style={[styles.button, { marginBottom: 10 }]}>
-          <Button title="Login" onPress={handleLogin} />
-        </View>
-        <View style={styles.button}>
-          <Button title="Back" onPress={() => navigation.navigate('Welcome')} />
-        </View>
-      </View>
-    </View>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+      <Text style={styles.linkText}>
+        New to the app?{' '}
+        <Text style={styles.link} onPress={handleCreateAccount}>
+           Create an account
+        </Text>
+      </Text>
+    </ScrollView>
   );
 };
 
@@ -59,10 +68,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 40,
   },
   title: {
-    fontSize: 24,
+    fontSize: 48,
+    fontWeight: 'bold',
+    marginBottom: 50,
+    marginTop: -90,
+    alignSelf: 'flex-start',
+  },
+  description: {
+    fontSize: 16,
     marginBottom: 20,
   },
   input: {
@@ -74,11 +90,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
   },
-  buttonContainer: {
-    width: '100%',
-  },
   button: {
-    width: '100%',
+    height: 50,
+    width: 190,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 25,
+    backgroundColor: '#007bff',
+    marginBottom: 30,
+    marginTop: 30,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 20,
+  },
+  linkText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  link: {
+    color: 'blue',
+    textDecorationLine: 'underline',
   },
 });
 
