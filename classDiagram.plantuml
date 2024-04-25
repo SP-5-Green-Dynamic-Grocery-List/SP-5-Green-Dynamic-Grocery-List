@@ -1,0 +1,28 @@
+@startuml
+actor User
+participant "Mobile App" as App
+database "Firebase Auth" as FirebaseAuth
+database "Firebase Database" as FirebaseDatabase
+database "Kroger API" as KrogerAPI
+
+' User interactions with the app
+User -> App : Login/Signup
+App -> FirebaseAuth : Request authentication
+FirebaseAuth -> App : Authentication response
+
+' User requests data from Firebase
+User -> App : Request Firebase data
+App -> FirebaseDatabase : Query data
+FirebaseDatabase -> App : Return data
+
+' User submits data to Firebase
+User -> App : Submit data to Firebase
+App -> FirebaseDatabase : Update data
+FirebaseDatabase -> App : Acknowledge update
+
+' User searches for a product using Kroger API
+User -> App : Search for "milk"
+App -> KrogerAPI : Fetch product data ("milk", "30114")
+KrogerAPI -> App : Return product details
+
+@enduml
