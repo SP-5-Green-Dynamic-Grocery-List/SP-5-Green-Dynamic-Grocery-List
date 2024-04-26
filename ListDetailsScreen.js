@@ -1,8 +1,8 @@
 // ListDetailsScreen.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, FlatList, Image, TouchableOpacity, Modal, TextInput } from 'react-native';
-import { ref, push, onValue, off } from 'firebase/database';
-import { database } from './config/firebase'; 
+import { ref, onValue, off, get, push } from 'firebase/database';
+import { database } from './config/firebase';
 
 const ListDetailsScreen = ({ route, navigation }) => {
   console.log('made it to details screen');
@@ -11,7 +11,8 @@ const ListDetailsScreen = ({ route, navigation }) => {
   const [collaborators, setCollaborators] = useState(list.collaboratorUIDs || []);
   const [newCollaborator, setNewCollaborator] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  console.log('beforeUse');
+  const [collaboratorEmails, setCollaboratorEmails] = useState([]);
+  
   useEffect(() => {
     console.log('made it to useeffect');
     const listRef = ref(database, `lists/${list.listId}/items`);
@@ -24,13 +25,82 @@ const ListDetailsScreen = ({ route, navigation }) => {
     console.log('databaseList: ',list.collaboratorUIDs)
     setCollaborators(list.collaboratorUIDs);
 
-    
-    console.log('List of Collaborators:', collaborators);
+    // Fetch collaborator emails when collaborators change
+    fetchCollaboratorEmails();
 
     return () => {
       off(listRef, 'value', onListChange);
     };
-  }, [list.listId, list.collaboratorUIDs, collaborators]);
+  }, [list.listId, list.collaboratorUIDs]);
+
+  const getEmails = async (uids) => {
+    console.log('Fetching emails for UIDs:', uids);
+    const promises = uids.map(async (uid) => {
+        try {
+            const userEmailSnapshot = await get(ref(database, 'users'));
+            const usersData = userEmailSnapshot.val();
+            const user = Object.values(usersData).find(user => user.UID === uid);
+            if (user && user.email) {
+                return user.email;
+            } else {
+                console.log('Email not found for collaborator with UID:', uid);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error fetching email for UID:', uid, error);
+            return null;
+        }
+    });
+
+    try {
+        const emails = await Promise.all(promises);
+        return emails.filter(email => email !== null); // Filter out null values
+    } catch (error) {
+        console.error('Error fetching collaborator emails:', error);
+        return [];
+    }
+};
+
+  
+  
+  
+  const fetchCollaboratorEmails = async () => {
+    try {
+      // Convert collaboratorUIDs object to an array of UIDs
+      const uidsArray = Object.values(list.collaboratorUIDs || {});
+      const emails = await getEmails(uidsArray);
+      setCollaboratorEmails(emails);
+    } catch (error) {
+      console.error('Error fetching collaborator emails:', error);
+    }
+  };
+  
+  
+/* this gets all UIDS for testing
+
+const getUsers = async () => {
+  try {
+    const usersSnapshot = await get(ref(database, 'users'));
+    const usersData = usersSnapshot.val();
+    if (usersData) {
+      const uids = Object.values(usersData).map(user => user.UID);
+      console.log('List of all UIDs in the users table:', uids);
+    } else {
+      console.log('No users found in the users table.');
+    }
+  } catch (error) {
+    console.error('Error fetching users from the database:', error);
+  }
+};
+getUsers();
+
+*/
+
+
+
+
+
+
 
   const addCollaborator = () => {
     console.log('attempting to add: ', newCollaborator);
@@ -43,32 +113,35 @@ const ListDetailsScreen = ({ route, navigation }) => {
       const user = userEmails.find((userData) => userData.email === newCollaborator);
       console.log('about to test user');
       // If user exists, add their UID to the collaboratorUIDs list
+      console.log('user:', user);
       if (user) {
         console.log('user passed');
         const listRef = ref(database, `lists/${list.listId}/collaboratorUIDs`);
-        push(listRef, user.UID); 
-        console.log('pushed: ', user.UID);
-        setNewCollaborator(''); // Clear input field after adding
+        try {
+          push(listRef, user.UID);
+          console.log('pushed: ', user.UID);
+          setNewCollaborator(''); // Clear input field after adding
+        } catch (error) {
+          console.error('Error adding collaborator UID:', error);
+        }
       } else {
         console.log('User not found');
-        
       }
+
     });
   };
-  
-
 
   return (
     <View style={styles.container}>
       <Text>Description: {list.description}</Text>
       <Text style={styles.title}>List Name: {list.listName}</Text>
       <Text>Collaborators:</Text>
-      <View>
-        {list.collaboratorUIDs && Object.values(list.collaboratorUIDs).map((collaborator, index) => (
-          <Text key={index}>{collaborator}</Text>
-        ))}
-        <Button title="Add Collaborator" onPress={() => setModalVisible(true)} />
-      </View>
+      <FlatList
+        data={collaboratorEmails}
+        renderItem={({ item }) => <Text>{item}</Text>}
+        keyExtractor={(item, index) => index.toString()}
+      />
+      <Button title="Add Collaborator" onPress={() => setModalVisible(true)} />
       <FlatList
         data={items}
         renderItem={({ item }) => (
@@ -88,7 +161,6 @@ const ListDetailsScreen = ({ route, navigation }) => {
       />
       <Button title="Back" onPress={() => navigation.goBack()} />
 
-      
       <Modal
         animationType="slide"
         transparent={true}
@@ -165,5 +237,6 @@ const styles = StyleSheet.create({
 });
 
 export default ListDetailsScreen;
+
 
 
