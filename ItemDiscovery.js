@@ -35,9 +35,13 @@ function ItemDiscovery({ navigation }) {
       const listsData = snapshot.val() || {};
       const listsArray = Object.entries(listsData)
         .map(([key, value]) => ({ ...value, listId: key }))
-        .filter(list => list.creatorUID === userID);
+        .filter(list => {
+          const collaboratorUIDs = Object.values(list.collaboratorUIDs || {});
+          return list.creatorUID === userID || collaboratorUIDs.includes(userID);
+        });
       setUserLists(listsArray);
     });
+    
 
     return () => {
       off(listsRef);
