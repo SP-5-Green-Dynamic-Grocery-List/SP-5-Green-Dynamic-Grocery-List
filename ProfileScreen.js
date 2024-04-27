@@ -14,7 +14,7 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    if (auth.currentUser) {
+    if (database.currentUser) {
       const userProfileRef = ref(database, `users/${auth.currentUser.uid}`);
       get(userProfileRef).then((snapshot) => {
         if (snapshot.exists()) {
@@ -30,9 +30,9 @@ const ProfileScreen = () => {
     }
   }, []);
 
+
   const handleSubmit = () => {
-    if (auth.currentUser) {
-      // Update email in Firebase Authentication
+    if (auth.currentUser.email) {
       updateEmail(auth.currentUser, email).then(() => {
         const userProfileRef = ref(database, `users/${auth.currentUser.uid}`);
         set(userProfileRef, {
