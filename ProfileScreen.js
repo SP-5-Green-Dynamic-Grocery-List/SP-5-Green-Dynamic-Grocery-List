@@ -1,8 +1,9 @@
-// ProfileScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TextInput, Button, Text } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { auth, database } from './config/firebase';
+import { updateEmail } from "firebase/auth";
+import { ref, set, get } from 'firebase/database';
 
 const ProfileScreen = () => {
   const [firstName, setFirstName] = useState('');
@@ -10,28 +11,51 @@ const ProfileScreen = () => {
   const [email, setEmail] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const navigation = useNavigation();
 
-  // State to store initial values
-  const [initialValues, setInitialValues] = useState({ firstName: '', lastName: '', email: '', zipCode: ''});
+  useEffect(() => {
+    if (auth.currentUser) {
+      const userProfileRef = ref(database, `users/${auth.currentUser.uid}`);
+      get(userProfileRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          setFirstName(data.firstName || '');
+          setLastName(data.lastName || '');
+          setEmail(data.email || '');
+          setZipCode(data.zipCode || '');
+        }
+      }).catch((error) => {
+        console.error("Failed to retrieve data:", error);
+      });
+    }
+  }, []);
 
   const handleSubmit = () => {
-    console.log('Submitting:', { firstName, lastName, email, zipCode });
-    alert('Profile Updated');
-    setIsEditing(false); // Turn off edit mode after submitting
-    // Update initial values to the new submitted values
-    setInitialValues({ firstName, lastName, email, ZipCode });
+    if (auth.currentUser) {
+      // Update email in Firebase Authentication
+      updateEmail(auth.currentUser, email).then(() => {
+        const userProfileRef = ref(database, `users/${auth.currentUser.uid}`);
+        set(userProfileRef, {
+          firstName: firstName,
+          lastName: lastName,
+          email: email,  // Synchronize email with Firebase Auth
+          zipCode: zipCode
+        }).then(() => {
+          alert('Profile Updated Successfully');
+          setIsEditing(false);
+        }).catch((error) => {
+          alert('Failed to update profile in database');
+          console.error("Error updating profile in database:", error);
+        });
+      }).catch((error) => {
+        alert('Failed to update email in Firebase Auth');
+        console.error("Error updating email in Firebase Auth:", error);
+      });
+    }
   };
 
   const handleEdit = () => {
-    if (!isEditing) { // If we're about to enter edit mode, store current values as initial
-      setInitialValues({ firstName, lastName, email });
-    } else { // If we're canceling edit mode, revert back to initial values
-      setFirstName(initialValues.firstName);
-      setLastName(initialValues.lastName);
-      setEmail(initialValues.email);
-      setZipCode(initialValues.zipCode);
-    }
-    setIsEditing(!isEditing); // Toggle edit mode
+    setIsEditing(!isEditing);
   };
 
   return (
@@ -39,6 +63,8 @@ const ProfileScreen = () => {
       {!isEditing ? (
         <>
           <Text style={styles.name}>{`${firstName} ${lastName}`}</Text>
+          <Text style={styles.profileText}>Email: {email}</Text>
+          <Text style={styles.profileText}>Zip Code: {zipCode}</Text>
           <Button title="Edit Profile" onPress={handleEdit} />
         </>
       ) : (
@@ -48,29 +74,24 @@ const ProfileScreen = () => {
             style={styles.input}
             onChangeText={setFirstName}
             value={firstName}
-            placeholder="Enter your first name"
           />
           <Text style={styles.label}>Last Name</Text>
           <TextInput
             style={styles.input}
             onChangeText={setLastName}
             value={lastName}
-            placeholder="Enter your last name"
           />
           <Text style={styles.label}>Email Address</Text>
           <TextInput
             style={styles.input}
             onChangeText={setEmail}
             value={email}
-            keyboardType="email-address"
-            placeholder="Enter your email address"
           />
           <Text style={styles.label}>Zip Code</Text>
           <TextInput
             style={styles.input}
             onChangeText={setZipCode}
-            value={lastName}
-            placeholder="Enter your Zip Code"
+            value={zipCode}
           />
           <Button title="Update Profile" onPress={handleSubmit} />
           <Button title="Cancel" onPress={handleEdit} />
