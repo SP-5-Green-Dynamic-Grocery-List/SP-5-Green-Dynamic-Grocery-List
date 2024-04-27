@@ -57,6 +57,7 @@ const ProfileScreen = () => {
   const handleEdit = () => {
     setIsEditing(!isEditing);
   };
+  
 
   return (
     <View style={styles.container}>
