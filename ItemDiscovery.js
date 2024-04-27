@@ -1,3 +1,4 @@
+//ItemDiscovery.js
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Text, Image, StyleSheet, Modal, FlatList, TouchableOpacity } from 'react-native';
 import { ref, onValue, off, push, get } from 'firebase/database';
@@ -13,6 +14,7 @@ function ItemDiscovery({ navigation }) {
   const [searchedItem, setSearchedItem] = useState('');
   const [fetchedProducts, setFetchedProducts] = useState([]);
   const [userZipCode, setUserZipCode] = useState('30114');
+  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     const userID = auth.currentUser?.uid;
@@ -49,8 +51,41 @@ function ItemDiscovery({ navigation }) {
   }, [searchedItem, userZipCode]);
 
   const addToSelectedList = (list) => {
+
     console.log('Adding item to list:', list);
-    setModalVisible(false);
+
+    if (selectedItem) {
+      const { productId, description, regularPrice, frontImage } = selectedItem;
+      const newItem = {
+        productId: productId,
+        name: description,
+        price: regularPrice,
+        frontImage: frontImage
+      };
+      console.log('newItem: ', newItem);
+
+      const listRef = ref(db, `lists/${list.listId}/items`); // Adds items to the list.items list. doenst specify the name it goes in from within items becuase we let firebase assigne a unique id.
+      push(listRef, newItem)
+        .then(() => {
+          console.log('Item added to list successfully: ', list.listName);
+          setModalVisible(false); // Close modal after adding item
+        })
+        .catch((error) => {
+          console.error('Error adding item to list: ', error);
+        })
+    }else{
+      console.error('No item selected to add');
+    }
+
+
+
+
+
+
+
+
+
+
   };
 
   return (
