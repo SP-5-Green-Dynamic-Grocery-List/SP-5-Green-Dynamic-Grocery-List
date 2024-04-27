@@ -12,13 +12,17 @@ const ProfileScreen = () => {
   const [zipCode, setZipCode] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const navigation = useNavigation();
+  
 
   useEffect(() => {
-    if (database.currentUser) {
+    console.log('entered ProfileScreen');
+    if (auth.currentUser) {
       const userProfileRef = ref(database, `users/${auth.currentUser.uid}`);
+      console.log('userProfileRef: ', userProfileRef)
       get(userProfileRef).then((snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
+          console.log('firstName: ', data.firstName);
           setFirstName(data.firstName || '');
           setLastName(data.lastName || '');
           setEmail(data.email || '');
