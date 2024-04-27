@@ -33,6 +33,7 @@ const ProfileScreen = () => {
     }
     setIsEditing(!isEditing); // Toggle edit mode
   };
+  
 
   return (
     <View style={styles.container}>

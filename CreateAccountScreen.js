@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, database } from './config/firebase';
+import { ref, onValue, off, get, push,} from 'firebase/database';
+import { database } from './config/firebase';
 
 const CreateAccountScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
