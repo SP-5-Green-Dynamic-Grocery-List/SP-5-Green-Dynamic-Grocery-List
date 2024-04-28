@@ -1,80 +1,61 @@
 //ItemDiscovery.js
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Text, Image, StyleSheet, Modal, FlatList, TouchableOpacity } from 'react-native';
-import { ref, onValue, off, push } from 'firebase/database';
+import { ref, onValue, off, push, get } from 'firebase/database';
 import fetchProductData from './index';
-import { database } from './config/firebase';
-import { useRoute } from '@react-navigation/native';
+import { auth, database } from './config/firebase';
 
 const db = database;
 
-function ItemDiscovery({ navigation, route }) {
+function ItemDiscovery({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [userLists, setUserLists] = useState([]);
   const [searchedItem, setSearchedItem] = useState('');
-  const [fetchedProducts, setFretchedProducts] = useState();
-
-  
-  const { user } = route.params
-
-  
+  const [fetchedProducts, setFetchedProducts] = useState([]);
+  const [userZipCode, setUserZipCode] = useState('30114');
+  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
-
-
-    const fetchData = async () => {
-      try {
-
-        const products = await fetchProductData(searchedItem, '30114'); //has to be called with await and within useEffect
-        console.log('Fetched products:', products);
-
-        setFretchedProducts(products);
-        
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-    
-    if (searchedItem !== '') {
-      fetchData();
+    const userID = auth.currentUser?.uid;
+    if (userID) {
+      const userRef = ref(db, `users/${userID}`);
+      get(userRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          setUserZipCode(userData.zipCode);
+        }
+      }).catch((error) => {
+        console.error('Error fetching user data:', error);
+      });
     }
 
     const listsRef = ref(db, 'lists');
-
-
-    const handleData = (snapshot) => {
-      const listsData = snapshot.val();
-
-      if (listsData) {
-        console.log('lists: ', listsData);
-        // Iterate over each list in db
-        const listsArray = Object.entries(listsData).map(([listId, list]) => ({ ...list, listId: listId }));
-        
-        const userLists = listsArray.filter(list => list.creatorUID === user.uid); 
-        
-        setUserLists(userLists);
-        console.log('some user lists: ', userLists);
-      } else {
-        setUserLists([]);
-        console.log('no user lists1');
-      }
-
-    };
-
-    onValue(listsRef, handleData);
-  
-    // Cleanup function to detach the listener when component unmounts
-    return () => {
-      // Detach the listener
-      off(listsRef, handleData);
-    };
-  }, [searchedItem, user]);
-
-  
-  const addToSelectedList = (list) => {
+    onValue(listsRef, (snapshot) => {
+      const listsData = snapshot.val() || {};
+      const listsArray = Object.entries(listsData)
+        .map(([key, value]) => ({ ...value, listId: key }))
+        .filter(list => {
+          const collaboratorUIDs = Object.values(list.collaboratorUIDs || {});
+          return list.creatorUID === userID || collaboratorUIDs.includes(userID);
+        });
+      setUserLists(listsArray);
+    });
     
+
+    return () => {
+      off(listsRef);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (searchedItem) {
+      fetchProductData(searchedItem, userZipCode).then(setFetchedProducts).catch(console.error);
+    }
+  }, [searchedItem, userZipCode]);
+
+  const addToSelectedList = (list) => {
+
     console.log('Adding item to list:', list);
 
     if (selectedItem) {
@@ -108,7 +89,7 @@ function ItemDiscovery({ navigation, route }) {
 
 
 
-    
+
   };
 
   return (
@@ -117,40 +98,35 @@ function ItemDiscovery({ navigation, route }) {
         style={styles.searchBar}
         placeholder="Search items..."
         value={searchQuery}
-        onChangeText={(text) => setSearchQuery(text)}
+        onChangeText={setSearchQuery}
       />
       <Button title="Search" onPress={() => setSearchedItem(searchQuery)} />
-      {fetchedProducts && (
-        <FlatList
-          data={fetchedProducts}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.listItem}
-              onPress={() => {
-                setSelectedItem(item); // Set the selected item
-                setModalVisible(true); // Show the modal to choose from user's lists
-              }}
-            >
-              <Image
-                source={{ uri: item.frontImage }}
-                style={styles.itemImage}
-                resizeMode="contain"
-              />
-              <Text>{item.description}</Text>
-              
-              <Text>${item.regularPrice}</Text>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.productId}
-        />
-      )}
+      <FlatList
+        data={fetchedProducts}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.listItem}
+            onPress={() => {
+              setSelectedItem(item);
+              setModalVisible(true);
+            }}
+          >
+            <Image
+              source={{ uri: item.frontImage }}
+              style={styles.itemImage}
+              resizeMode="contain"
+            />
+            <Text>{item.description}</Text>
+            <Text>${item.regularPrice}</Text>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => item.productId}
+      />
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
+        onRequestClose={() => setModalVisible(!modalVisible)}
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
@@ -166,16 +142,12 @@ function ItemDiscovery({ navigation, route }) {
               )}
               keyExtractor={(item) => item.listId}
             />
-            <Button
-              title="Cancel"
-              onPress={() => setModalVisible(!modalVisible)}
-            />
+            <Button title="Cancel" onPress={() => setModalVisible(!modalVisible)} />
           </View>
         </View>
       </Modal>
     </View>
   );
-  
 }
 
 const styles = StyleSheet.create({
@@ -231,6 +203,3 @@ const styles = StyleSheet.create({
 });
 
 export default ItemDiscovery;
-
-
-

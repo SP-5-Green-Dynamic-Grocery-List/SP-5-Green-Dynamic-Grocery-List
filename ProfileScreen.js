@@ -12,13 +12,17 @@ const ProfileScreen = () => {
   const [zipCode, setZipCode] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const navigation = useNavigation();
+  
 
   useEffect(() => {
+    console.log('entered ProfileScreen');
     if (auth.currentUser) {
       const userProfileRef = ref(database, `users/${auth.currentUser.uid}`);
+      console.log('userProfileRef: ', userProfileRef)
       get(userProfileRef).then((snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
+          console.log('firstName: ', data.firstName);
           setFirstName(data.firstName || '');
           setLastName(data.lastName || '');
           setEmail(data.email || '');
@@ -30,9 +34,9 @@ const ProfileScreen = () => {
     }
   }, []);
 
+
   const handleSubmit = () => {
-    if (auth.currentUser) {
-      // Update email in Firebase Authentication
+    if (auth.currentUser.email) {
       updateEmail(auth.currentUser, email).then(() => {
         const userProfileRef = ref(database, `users/${auth.currentUser.uid}`);
         set(userProfileRef, {
