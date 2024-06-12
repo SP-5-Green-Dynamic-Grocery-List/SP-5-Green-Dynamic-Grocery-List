@@ -155,6 +155,14 @@ getUsers();
             />
             <Text>{item.name}</Text>
             <Text>${item.price}</Text>
+            {item.Location && item.Location.length > 0 && (
+        <Text>
+          Aisle: {item.Location[0].number}, 
+          Shelf: {item.Location[0].shelfNumber}, 
+          Position: {item.Location[0].shelfPositionInBay}, 
+          Side: {item.Location[0].side}
+        </Text>
+      )}
           </TouchableOpacity>
         )}
         keyExtractor={(item) => item.productId}

@@ -86,6 +86,7 @@ async function fetchProductData(productQuery, zipCode) {
             // Grab the image url and get the small one 3 because we dont want the 4k pic
             const frontImageUrl = product.images && product.images.find(image => image.perspective === 'front');
             const frontImageUrlMedium = frontImageUrl ? frontImageUrl.sizes.find(size => size.size === 'medium').url : null;
+            const productLocation = product.aisleLocations
             
             
             const productInfo = {
@@ -96,9 +97,12 @@ async function fetchProductData(productQuery, zipCode) {
               countryOrigin: product.countryOrigin,
               description: product.description,
               regularPrice: regularPrice,
-              frontImage: frontImageUrlMedium
+              frontImage: frontImageUrlMedium,
+              Location: productLocation
+            
             };
-
+              
+            console.log(productInfo);
             // Add the product information to the array
             products.push(productInfo);
           });

@@ -59,12 +59,13 @@ function ItemDiscovery({ navigation }) {
     console.log('Adding item to list:', list);
 
     if (selectedItem) {
-      const { productId, description, regularPrice, frontImage } = selectedItem;
+      const { productId, description, regularPrice, frontImage, Location} = selectedItem;
       const newItem = {
         productId: productId,
         name: description,
         price: regularPrice,
-        frontImage: frontImage
+        frontImage: frontImage,
+        Location: Location
       };
       console.log('newItem: ', newItem);
 
